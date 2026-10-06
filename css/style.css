@@ -2941,7 +2941,6 @@ body.menu-open .navbar {
 /* ============================================================
    26. QOECH MARK SIZING
    ============================================================ */
-.brand-q,
 .footer-q,
 .preloader-q,
 .visual-core-mark,
@@ -2957,25 +2956,6 @@ body.menu-open .navbar {
   mix-blend-mode: multiply;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-}
-
-.brand-top {
-  display: flex;
-  align-items: center;
-  line-height: 1;
-}
-
-.brand-q {
-  height: 36px;
-  width: 36px;
-  transform: scale(1.35);
-  margin-right: 0.15rem;
-  filter: drop-shadow(0 2px 6px rgba(22, 163, 74, 0.18));
-  transition: var(--transition);
-}
-.brand:hover .brand-q {
-  transform: scale(1.35) rotate(-8deg);
-  filter: drop-shadow(0 4px 12px rgba(22, 163, 74, 0.26));
 }
 
 .preloader-q {
@@ -3024,7 +3004,6 @@ body.menu-open .navbar {
   transform: scale(1.1);
   opacity: 0.06;
 }
-
 
 /* ============================================================
    27. RESPONSIVE BREAKPOINTS
