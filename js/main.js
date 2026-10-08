@@ -214,6 +214,8 @@
 
   /* ============================================================
      05. SMOOTH SCROLL FOR ANCHOR LINKS
+     Reads the actual navbar bottom edge so the scroll position
+     accounts for the floating pill's top offset.
      ============================================================ */
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', function (e) {
@@ -224,8 +226,9 @@
       if (!target) return;
 
       e.preventDefault();
-      const navHeight = 72;
-      const top = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
+      const navbar = document.getElementById('navbar');
+      const navBottom = navbar ? navbar.getBoundingClientRect().bottom : 72;
+      const top = target.getBoundingClientRect().top + window.pageYOffset - navBottom - 20;
       window.scrollTo({ top, behavior: 'smooth' });
 
       history.replaceState(null, '', targetId);
