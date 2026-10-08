@@ -536,7 +536,7 @@ strong { font-weight: 600; color: var(--text-heading); }
               inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
-/* ---- Brand: the Q logo tucks into "OECH" ---- */
+/* ---- Brand: the Q logo tucks into "OECH" as one wordmark ---- */
 .brand {
   display: inline-flex;
   flex-direction: column;
@@ -548,29 +548,43 @@ strong { font-weight: 600; color: var(--text-heading); }
   flex-shrink: 0;
 }
 
-/* Bottom-align Q and OECH so they share a baseline */
+/* Bottom-align Q and OECH so they share a baseline.
+   Gap is tight (0.05rem ≈ 0.8px) so the Q reads as part of the word. */
 .brand-top {
   display: inline-flex;
   align-items: flex-end;
   line-height: 1;
-  gap: 0.06rem;
+  gap: 0.05rem;
 }
 
-/* Letter Q — taller than OECH, sits on the same baseline */
-.brand-q {
-  height: 38px;
-  width: auto;
-  display: block;
+/* Crop wrapper — clips the PNG's transparent padding away.
+   This is the box that actually occupies space in the layout. */
+.brand-q-wrap {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
+  overflow: hidden;
+  /* Pulls the wrapper up so the visible eagle's base sits on the
+     OECH baseline. Tune -1px → -4px in 1px steps. */
+  transform: translateY(-2px);
+}
+
+/* The actual image — scaled up so its internal padding is pushed
+   outside the 36px box and clipped. Tune 1.5 → 2.3. */
+.brand-q {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  margin: 0;
-  transform: translateY(-4px);
-  transition: var(--transition);
+  transform: scale(1.7);
+  transform-origin: center;
+  transition: transform var(--transition);
   -webkit-user-drag: none;
   user-select: none;
 }
 .brand:hover .brand-q {
-  transform: translateY(-4px) rotate(-4deg);
+  transform: scale(1.7) rotate(-4deg);
 }
 
 .brand-letters {
@@ -589,7 +603,7 @@ strong { font-weight: 600; color: var(--text-heading); }
   font-weight: 500;
   letter-spacing: 0.32em;
   color: var(--primary-dark);
-  margin-left: calc(38px + 0.06rem);
+  margin-left: calc(36px + 0.05rem);
   line-height: 1;
 }
 
@@ -701,7 +715,6 @@ strong { font-weight: 600; color: var(--text-heading); }
   transform: translateY(-1px);
   box-shadow: var(--shadow-brand);
 }
-
 /* ============================================================
    10. HAMBURGER + MOBILE MENU
    ============================================================ */
