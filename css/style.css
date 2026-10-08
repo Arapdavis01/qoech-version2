@@ -3114,7 +3114,7 @@ body.menu-open .navbar {
 
 
 /* ============================================================
-   26. QOECH MARK SIZING — crop-wrapper approach
+   26. QOECH MARK SIZING — crop-wrapper + free-floating hero mark
    ============================================================ */
 .footer-q,
 .preloader-q,
@@ -3140,24 +3140,18 @@ body.menu-open .navbar {
   animation: preloaderPulse 2s ease-in-out infinite;
 }
 
-/* Hero visual-core — crop wrapper clips the mark to a circle */
+/* Hero visual-core — free-floating mark, no circle, no clipping.
+   Layout comes from Section 11; this is just the sizing override. */
 .visual-core {
-  overflow: hidden;
-  border-radius: 50%;
-}
-.visual-core-mark-wrap {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  overflow: visible;
+  border-radius: 0;
 }
 .visual-core-mark {
   width: 100%;
   height: 100%;
   transform: scale(1.7);
-  filter: drop-shadow(0 2px 12px rgba(22, 163, 74, 0.22));
+  filter: drop-shadow(0 16px 36px rgba(22, 163, 74, 0.30))
+          drop-shadow(0 4px 12px rgba(15, 23, 42, 0.15));
 }
 
 /* About card preview tile */
@@ -3269,8 +3263,10 @@ body.menu-open .navbar {
   .hero-typing { font-size: 0.85rem; }
   .hero-actions .btn { flex: 1; justify-content: center; }
   .visual-stage { width: 260px; height: 260px; }
-  .visual-core { width: 110px; height: 110px; }
+  /* Free-floating eagle scaled up to match the no-circle layout */
+  .visual-core { width: 170px; height: 170px; }
   .visual-core-mark { width: 100%; height: 100%; transform: scale(1.7); }
+  .visual-pulse { width: 170px; height: 170px; }
   .orbit-node { width: 32px; height: 32px; font-size: 0.8rem; top: -16px; }
   .trust-divider { display: none; }
   .hero-trust { gap: 1.75rem; }
@@ -3341,7 +3337,6 @@ body.menu-open .navbar {
   .thumb-scan { display: none; }
   .footer-scanline { display: none; }
 }
-
 /* ============================================================
    28. CONTACT WIZARD
    ============================================================ */
