@@ -27,7 +27,7 @@
    23. Back to Top
    24. Modals (Service + Project)
    25. Fade-up Scroll Animations
-   26. Qoech Mark Sizing (transparent-PNG aware)
+   26. Qoech Mark Sizing (transparent-PNG)
    27. Responsive Breakpoints
    28. Contact Wizard
    29. Digital Layer (grain, status, brackets, dividers, watermarks)
@@ -398,13 +398,10 @@ strong { font-weight: 600; color: var(--text-heading); }
   z-index: 1;
   height: 130px;
   width: 130px;
-  object-fit: cover;
-  border-radius: 50%;
-  mix-blend-mode: multiply;
-  filter: drop-shadow(0 4px 12px rgba(22, 163, 74, 0.18));
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(22, 163, 74, 0.22));
   animation: preloaderPulse 2s ease-in-out infinite;
 }
-.preloader-q.logo-transparent { mix-blend-mode: normal; }
 
 .preloader-text {
   margin-top: 2rem;
@@ -543,22 +540,20 @@ strong { font-weight: 600; color: var(--text-heading); }
 }
 
 .brand-q {
-  height: 30px;
+  height: 32px;
   width: auto;
   display: block;
   flex-shrink: 0;
   object-fit: contain;
-  margin-right: -0.02em;
-  margin-left: -0.02em;
-  transform: translateY(1px);
+  margin-right: 0.1rem;
+  margin-left: 0;
+  transform: translateY(2px);
   transition: var(--transition);
   -webkit-user-drag: none;
   user-select: none;
-  mix-blend-mode: multiply;
 }
-.brand-q.logo-transparent { mix-blend-mode: normal; }
 .brand:hover .brand-q {
-  transform: translateY(1px) rotate(-4deg);
+  transform: translateY(2px) rotate(-4deg);
 }
 
 .brand-letters {
@@ -891,7 +886,6 @@ body.menu-open .navbar {
   z-index: 1;
 }
 
-/* Layer 1 — hero background photo (strong visibility) */
 .hero-image-bg {
   position: absolute;
   inset: 0;
@@ -903,7 +897,6 @@ body.menu-open .navbar {
   pointer-events: none;
 }
 
-/* Layer 2 — much weaker white scrim so the photo reads through */
 .hero-bg {
   position: absolute;
   inset: 0;
@@ -914,7 +907,6 @@ body.menu-open .navbar {
     linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(248, 250, 252, 0.40) 100%);
 }
 
-/* Layer 3 — grid overlay */
 .hero-grid {
   position: absolute;
   inset: 0;
@@ -928,7 +920,6 @@ body.menu-open .navbar {
   opacity: 0.9;
 }
 
-/* Corner brackets */
 .hero-brackets {
   position: absolute;
   inset: calc(var(--nav-height) + 3rem) 2rem 4rem;
@@ -957,11 +948,8 @@ body.menu-open .navbar {
   z-index: 2;
 }
 
-.hero-content { max-width: 620px; }
-
-/* Give the content block a frosted plate so text stays perfectly
-   legible on top of the strong hero photo */
 .hero-content {
+  max-width: 620px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.35) 100%);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -1113,7 +1101,6 @@ body.menu-open .navbar {
   background: rgba(15, 23, 42, 0.10);
 }
 
-/* Hero Visual */
 .hero-visual {
   display: flex;
   align-items: center;
@@ -1304,6 +1291,7 @@ body.menu-open .navbar {
   color: var(--text-muted);
 }
 .ticker-item i { color: var(--primary); font-size: 0.65rem; }
+
 
 /* ============================================================
    12. ABOUT
@@ -2059,13 +2047,19 @@ body.menu-open .navbar {
 
 .capabilities {
   padding: 2.75rem 2.25rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(250, 251, 252, 0.88) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.50) 100%
+  );
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   z-index: 2;
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
 }
 .capabilities::before {
   content: '';
@@ -2094,13 +2088,15 @@ body.menu-open .navbar {
   align-items: center;
   gap: 0.7rem;
   padding: 0.85rem 1.05rem;
-  background: #FFFFFF;
+  background: rgba(255, 255, 255, 0.85);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   font-size: 0.8375rem;
   font-weight: 500;
   color: var(--text-secondary);
   transition: var(--transition);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 .capability-item i { color: var(--primary); font-size: 0.9rem; width: 18px; text-align: center; }
 .capability-item:hover {
@@ -2751,9 +2747,9 @@ body.menu-open .navbar {
 .footer-q {
   height: 34px;
   width: 34px;
-  transform: scale(1.35);
-  margin-right: 0.15rem;
-  filter: drop-shadow(0 2px 6px rgba(22, 163, 74, 0.18));
+  transform: scale(1.05);
+  margin-right: 0.1rem;
+  filter: drop-shadow(0 2px 6px rgba(22, 163, 74, 0.20));
 }
 
 .footer-letters {
@@ -3085,55 +3081,54 @@ body.menu-open .navbar {
 
 /* ============================================================
    26. QOECH MARK SIZING
-   Once the JS white-stripper swaps in the transparent PNG,
-   the .logo-transparent class drops mix-blend-mode so the
-   colour rendition stays clean.
+   PNG is transparent — no blend modes, no cover-cropping.
    ============================================================ */
 .footer-q,
 .preloader-q,
 .visual-core-mark,
 .about-card-mark img {
   display: block;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   transform-origin: center;
   pointer-events: none;
   -webkit-user-drag: none;
   user-select: none;
-  mix-blend-mode: multiply;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-}
-.footer-q.logo-transparent,
-.preloader-q.logo-transparent,
-.visual-core-mark.logo-transparent,
-.about-card-mark img.logo-transparent {
-  mix-blend-mode: normal;
 }
 
 .preloader-q {
   height: 64px; width: 64px;
   display: inline-block;
   vertical-align: middle;
-  transform: scale(1.35);
-  margin-right: 0.05em;
-  margin-left: -0.05em;
-  filter: drop-shadow(0 4px 12px rgba(22, 163, 74, 0.18));
+  transform: scale(1.05);
+  margin-right: 0;
+  margin-left: 0;
+  filter: drop-shadow(0 4px 12px rgba(22, 163, 74, 0.22));
   animation: preloaderPulse 1.8s ease-in-out infinite;
 }
 
-.visual-core { overflow: hidden; }
+.visual-core { overflow: visible; }
 .visual-core-mark {
   width: 100%; height: 100%;
-  transform: scale(1.4);
-  filter: drop-shadow(0 2px 12px rgba(22, 163, 74, 0.20));
+  transform: scale(1);
+  filter: drop-shadow(0 2px 12px rgba(22, 163, 74, 0.22));
 }
 
-.about-card-mark { overflow: hidden; }
+.about-card-mark { overflow: visible; }
 .about-card-mark img {
   width: 100%; height: 100%;
-  transform: scale(1.4);
-  filter: drop-shadow(0 2px 10px rgba(22, 163, 74, 0.18));
+  transform: scale(1);
+  filter: drop-shadow(0 2px 10px rgba(22, 163, 74, 0.20));
+}
+
+.footer-q {
+  height: 34px;
+  width: 34px;
+  transform: scale(1.05);
+  margin-right: 0.1rem;
+  filter: drop-shadow(0 2px 6px rgba(22, 163, 74, 0.20));
 }
 
 
@@ -3208,22 +3203,23 @@ body.menu-open .navbar {
   }
   .navbar.scrolled { top: 8px; }
 
-  .brand-q { height: 26px; margin-left: -0.02em; margin-right: -0.02em; }
+  .brand-q { height: 26px; margin-left: 0; margin-right: 0.1rem; }
   .brand-letters { font-size: 1.15rem; letter-spacing: 0.14em; }
   .brand-sub { font-size: 0.5rem; letter-spacing: 0.28em; margin-left: 0.9em; }
 
   .preloader-text { font-size: 1.3rem; }
-  .preloader-q { height: 52px; width: 52px; transform: scale(1.3); }
+  .preloader-q { height: 52px; width: 52px; transform: scale(1.05); }
   .preloader-readout { font-size: 0.6rem; }
 
   .hero { padding: calc(var(--nav-height) + 4rem) 0 5rem; }
+  .hero-content { padding: 1.5rem 1.5rem 1.25rem; }
   .hero-title { font-size: clamp(1.875rem, 8vw, 2.5rem); }
   .hero-description { font-size: 0.9375rem; }
   .hero-typing { font-size: 0.85rem; }
   .hero-actions .btn { flex: 1; justify-content: center; }
   .visual-stage { width: 260px; height: 260px; }
   .visual-core { width: 110px; height: 110px; }
-  .visual-core-mark { width: 100%; height: 100%; transform: scale(1.4); }
+  .visual-core-mark { width: 100%; height: 100%; transform: scale(1); }
   .orbit-node { width: 32px; height: 32px; font-size: 0.8rem; top: -16px; }
   .trust-divider { display: none; }
   .hero-trust { gap: 1.75rem; }
@@ -3238,7 +3234,7 @@ body.menu-open .navbar {
 
   .about-card { padding: 1.75rem 1.5rem; }
   .about-card-mark { width: 52px; height: 52px; }
-  .footer-q { height: 28px; width: 28px; transform: scale(1.3); }
+  .footer-q { height: 28px; width: 28px; transform: scale(1.05); }
 
   .section-head { margin-bottom: 2.75rem; }
   .section-label { font-size: 0.6rem; padding: 0.35rem 0.85rem; }
@@ -3993,7 +3989,6 @@ body.menu-open .navbar {
   opacity: 0.9;
 }
 
-/* ---- Section banner behind Projects head (OBVIOUSLY visible) ---- */
 .section-banner-bg {
   position: absolute;
   top: 0;
@@ -4015,8 +4010,6 @@ body.menu-open .navbar {
   z-index: 2;
 }
 
-/* Sections that carry a banner need a frosted text plate so
-   headings stay legible on top of the strong image */
 .section-banner-bg ~ .container .section-head {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.35) 100%);
   border-radius: var(--radius-lg);
@@ -4026,7 +4019,6 @@ body.menu-open .navbar {
   box-shadow: 0 4px 20px -8px rgba(15, 23, 42, 0.08);
 }
 
-/* ---- Capabilities inner background (OBVIOUSLY visible) ---- */
 .capabilities-bg {
   position: absolute;
   inset: 0;
@@ -4043,25 +4035,6 @@ body.menu-open .navbar {
   z-index: 2;
 }
 
-/* Lighter white base so the image reads through */
-.capabilities {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.35) 0%,
-    rgba(255, 255, 255, 0.50) 100%
-  );
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-}
-
-/* Capability items get their own solid plate so text stays readable */
-.capability-item {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-/* ---- Floating stat badge (unchanged) ---- */
 .thumb-badge {
   position: absolute;
   bottom: 1rem;
