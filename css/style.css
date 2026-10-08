@@ -891,7 +891,7 @@ body.menu-open .navbar {
   z-index: 1;
 }
 
-/* Layer 1 — subtle tech photo (now actually visible) */
+/* Layer 1 — hero background photo (strong visibility) */
 .hero-image-bg {
   position: absolute;
   inset: 0;
@@ -899,19 +899,19 @@ body.menu-open .navbar {
   background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
-  opacity: 0.12;
+  opacity: 0.85;
   pointer-events: none;
 }
 
-/* Layer 2 — semi-transparent gradient washes */
+/* Layer 2 — much weaker white scrim so the photo reads through */
 .hero-bg {
   position: absolute;
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(22, 163, 74, 0.10) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 60% at 85% 80%, rgba(166, 124, 62, 0.08) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 252, 0.92) 100%);
+    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(22, 163, 74, 0.20) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 60% at 85% 80%, rgba(166, 124, 62, 0.14) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(248, 250, 252, 0.40) 100%);
 }
 
 /* Layer 3 — grid overlay */
@@ -958,6 +958,17 @@ body.menu-open .navbar {
 }
 
 .hero-content { max-width: 620px; }
+
+/* Give the content block a frosted plate so text stays perfectly
+   legible on top of the strong hero photo */
+.hero-content {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.35) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem 2.25rem 2rem;
+  box-shadow: 0 8px 32px -12px rgba(15, 23, 42, 0.10);
+}
 
 .hero-badge {
   display: inline-flex;
@@ -1070,7 +1081,7 @@ body.menu-open .navbar {
   gap: 1.75rem;
   flex-wrap: wrap;
   padding-top: 2rem;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid rgba(15, 23, 42, 0.10);
 }
 .trust-item {
   display: flex;
@@ -1099,7 +1110,7 @@ body.menu-open .navbar {
 .trust-divider {
   width: 1px;
   height: 36px;
-  background: var(--border-subtle);
+  background: rgba(15, 23, 42, 0.10);
 }
 
 /* Hero Visual */
@@ -1124,20 +1135,20 @@ body.menu-open .navbar {
 }
 .visual-ring-outer {
   width: 100%; height: 100%;
-  border-top-color: rgba(22, 163, 74, 0.35);
-  border-right-color: rgba(166, 124, 62, 0.25);
+  border-top-color: rgba(22, 163, 74, 0.55);
+  border-right-color: rgba(166, 124, 62, 0.40);
   animation: ringSpin 28s linear infinite;
 }
 .visual-ring-mid {
   width: 78%; height: 78%;
-  border-bottom-color: rgba(22, 163, 74, 0.25);
-  border-left-color: rgba(166, 124, 62, 0.28);
+  border-bottom-color: rgba(22, 163, 74, 0.40);
+  border-left-color: rgba(166, 124, 62, 0.44);
   animation: ringSpin 22s linear infinite reverse;
 }
 .visual-ring-inner {
   width: 56%; height: 56%;
-  border-top-color: rgba(22, 163, 74, 0.4);
-  border-bottom-color: rgba(166, 124, 62, 0.2);
+  border-top-color: rgba(22, 163, 74, 0.60);
+  border-bottom-color: rgba(166, 124, 62, 0.35);
   animation: ringSpin 16s linear infinite;
 }
 @keyframes ringSpin { 100% { transform: rotate(360deg); } }
@@ -1223,10 +1234,12 @@ body.menu-open .navbar {
   letter-spacing: 0.14em;
   color: var(--text-muted);
   padding: 0.2rem 0.55rem;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-pill);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 2px 6px -2px rgba(15, 23, 42, 0.08);
 }
 .stage-readout-tl { top: 6%; left: 2%; }
 .stage-readout-tr { top: 6%; right: 2%; }
@@ -1272,7 +1285,7 @@ body.menu-open .navbar {
   justify-content: center;
   gap: 2.5rem;
   padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid var(--border-subtle);
@@ -1291,7 +1304,6 @@ body.menu-open .navbar {
   color: var(--text-muted);
 }
 .ticker-item i { color: var(--primary); font-size: 0.65rem; }
-
 
 /* ============================================================
    12. ABOUT
