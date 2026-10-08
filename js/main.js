@@ -3,28 +3,24 @@
    ============================================================
    Table of Contents
    01. Preloader
-   02. Scroll Progress Bar
-   03. Cursor Glow
-   04. Particles Network (tsParticles + cursor grab)
-   05. Navbar Scroll State
-   06. Mobile Menu + Animated Hamburger
-   07. Active Nav Link on Scroll
-   08. Smooth Scroll for Anchor Links
-   09. Hero Typing Effect
-   10. Fade-up Scroll Animations
-   11. Stats Counter Animation
-   12. About Tabs
-   13. Service Data + Modal
-   14. Project Data + Modal
-   15. Modal Helpers (close, escape, overlay, delegation)
-   16. Testimonial Carousel
-   17. Contact Wizard (Request a System)
-   18. Back to Top
-   19. Footer Year
-   20. Hero Parallax (subtle)
-   21. Image Modal — full-screen gallery viewer
-   22. Terminal Modal — code sample viewer
-   23. Public API (window.QOECH)
+   02. Cursor Glow
+   03. Particles Network (tsParticles + cursor grab)
+   04. Mobile Menu + Animated Hamburger
+   05. Smooth Scroll for Anchor Links
+   06. Hero Typing Effect
+   07. Fade-up Scroll Animations
+   08. About Tabs
+   09. Service Data + Modal
+   10. Project Data + Modal
+   11. Modal Helpers (close, escape, overlay, delegation)
+   12. Testimonial Carousel
+   13. Contact Wizard (Request a System)
+   14. Footer Year
+   15. Image Modal — full-screen gallery viewer
+   16. Terminal Modal — code sample viewer
+   17. Public API (window.QOECH)
+   18. Unified Scroll Loop — progress bar, navbar state,
+       active link, back-to-top, hero parallax, stats counter
    ============================================================ */
 
 (function () {
@@ -42,22 +38,7 @@
 
 
   /* ============================================================
-     02. SCROLL PROGRESS BAR
-     ============================================================ */
-  const scrollProgress = document.getElementById('scrollProgress');
-  const updateProgress = () => {
-    if (!scrollProgress) return;
-    const scrollTop = window.scrollY;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-    scrollProgress.style.width = pct + '%';
-  };
-  window.addEventListener('scroll', updateProgress, { passive: true });
-  updateProgress();
-
-
-  /* ============================================================
-     03. CURSOR GLOW (desktop only)
+     02. CURSOR GLOW (desktop only)
      ============================================================ */
   const cursorGlow = document.getElementById('cursorGlow');
   const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -89,7 +70,7 @@
 
 
   /* ============================================================
-     04. PARTICLES NETWORK — tsParticles with cursor grab
+     03. PARTICLES NETWORK — tsParticles with cursor grab
      ============================================================ */
   const initParticles = () => {
     if (typeof tsParticles === 'undefined') return;
@@ -171,20 +152,7 @@
 
 
   /* ============================================================
-     05. NAVBAR SCROLL STATE
-     ============================================================ */
-  const navbar = document.getElementById('navbar');
-  const onNavScroll = () => {
-    if (!navbar) return;
-    if (window.scrollY > 40) navbar.classList.add('scrolled');
-    else navbar.classList.remove('scrolled');
-  };
-  window.addEventListener('scroll', onNavScroll, { passive: true });
-  onNavScroll();
-
-
-  /* ============================================================
-     06. MOBILE MENU + ANIMATED HAMBURGER
+     04. MOBILE MENU + ANIMATED HAMBURGER
      ============================================================ */
   const hamburger   = document.getElementById('hamburger');
   const navMenu     = document.getElementById('navMenu');
@@ -245,36 +213,7 @@
 
 
   /* ============================================================
-     07. ACTIVE NAV LINK ON SCROLL
-     ============================================================ */
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-link');
-
-  const updateActiveLink = () => {
-    const scrollPos = window.scrollY + 140;
-    let currentId = '';
-
-    sections.forEach((section) => {
-      const top = section.offsetTop;
-      const height = section.clientHeight;
-      if (scrollPos >= top && scrollPos < top + height) {
-        currentId = section.getAttribute('id');
-      }
-    });
-
-    navLinks.forEach((link) => {
-      link.classList.remove('active');
-      const href = link.getAttribute('href');
-      if (href === '#' + currentId) link.classList.add('active');
-    });
-  };
-
-  window.addEventListener('scroll', updateActiveLink, { passive: true });
-  window.addEventListener('load', updateActiveLink);
-
-
-  /* ============================================================
-     08. SMOOTH SCROLL FOR ANCHOR LINKS
+     05. SMOOTH SCROLL FOR ANCHOR LINKS
      ============================================================ */
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', function (e) {
@@ -285,7 +224,7 @@
       if (!target) return;
 
       e.preventDefault();
-      const navHeight = navbar ? navbar.offsetHeight : 72;
+      const navHeight = 72;
       const top = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
       window.scrollTo({ top, behavior: 'smooth' });
 
@@ -295,7 +234,7 @@
 
 
   /* ============================================================
-     09. HERO TYPING EFFECT
+     06. HERO TYPING EFFECT
      ============================================================ */
   const typedEl = document.getElementById('typed-text');
   if (typedEl) {
@@ -342,7 +281,7 @@
 
 
   /* ============================================================
-     10. FADE-UP SCROLL ANIMATIONS
+     07. FADE-UP SCROLL ANIMATIONS
      ============================================================ */
   const fadeEls = document.querySelectorAll(
     '.fade-up, .section-head, .section-divider, ' +
@@ -377,52 +316,7 @@
 
 
   /* ============================================================
-     11. STATS COUNTER ANIMATION
-     ============================================================ */
-  const statNumbers = document.querySelectorAll('.stat-number');
-  const animateStats = () => {
-    statNumbers.forEach((el) => {
-      const target = parseInt(el.getAttribute('data-target')) || 0;
-      const suffix = el.getAttribute('data-suffix') || '';
-      const duration = 1600;
-      const startTime = performance.now();
-
-      const tick = (now) => {
-        const elapsed = now - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const value = Math.floor(eased * target);
-        el.textContent = value + suffix;
-        if (progress < 1) requestAnimationFrame(tick);
-        else el.textContent = target + suffix;
-      };
-      requestAnimationFrame(tick);
-    });
-  };
-
-  if (statNumbers.length) {
-    if ('IntersectionObserver' in window) {
-      const statsObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              animateStats();
-              statsObserver.disconnect();
-            }
-          });
-        },
-        { threshold: 0.4 }
-      );
-      const statsGrid = document.querySelector('.stats-grid');
-      if (statsGrid) statsObserver.observe(statsGrid);
-    } else {
-      animateStats();
-    }
-  }
-
-
-  /* ============================================================
-     12. ABOUT TABS
+     08. ABOUT TABS
      ============================================================ */
   const tabBtns = document.querySelectorAll('.tab-btn');
   const tabContents = document.querySelectorAll('.tab-content');
@@ -445,7 +339,7 @@
 
 
   /* ============================================================
-     13. SERVICE DATA + MODAL
+     09. SERVICE DATA + MODAL
      ============================================================ */
   const serviceData = {
     software: {
@@ -679,7 +573,7 @@
 
 
   /* ============================================================
-     14. PROJECT DATA + MODAL
+     10. PROJECT DATA + MODAL
      ============================================================ */
   const projectData = {
     hardware: {
@@ -823,7 +717,7 @@
 
 
   /* ============================================================
-     15. MODAL HELPERS
+     11. MODAL HELPERS
      ============================================================ */
   let lastFocusedEl = null;
 
@@ -857,7 +751,6 @@
     const modal = closeBtn.closest('.modal');
     if (!modal) return;
 
-    // If it's a link to #contact, let the default smooth-scroll run, then close
     if (closeBtn.tagName === 'A' && closeBtn.getAttribute('href') === '#contact') {
       closeModal(modal);
       return;
@@ -876,7 +769,7 @@
 
 
   /* ============================================================
-     16. TESTIMONIAL CAROUSEL
+     12. TESTIMONIAL CAROUSEL
      ============================================================ */
   const testimonialSlides = document.querySelectorAll('.testimonial-slide');
   const testimonialDots = document.querySelectorAll('.testimonial-dots .dot');
@@ -928,7 +821,7 @@
 
 
   /* ============================================================
-     17. CONTACT WIZARD — Request a System
+     13. CONTACT WIZARD — Request a System
      ============================================================ */
   const WIZARD_API = 'https://eaglevision-api.onrender.com/api/public/system-requests';
   const STORAGE_KEY = 'qoech_wizard_v1';
@@ -1286,51 +1179,14 @@
 
 
   /* ============================================================
-     18. BACK TO TOP
-     ============================================================ */
-  const backToTop = document.getElementById('backToTop');
-  if (backToTop) {
-    const toggleBackToTop = () => {
-      if (window.scrollY > 500) backToTop.classList.add('visible');
-      else backToTop.classList.remove('visible');
-    };
-    window.addEventListener('scroll', toggleBackToTop, { passive: true });
-    toggleBackToTop();
-
-    backToTop.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-
-  /* ============================================================
-     19. FOOTER YEAR
+     14. FOOTER YEAR
      ============================================================ */
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 
   /* ============================================================
-     20. HERO PARALLAX (subtle, desktop only)
-     ============================================================ */
-  const hero = document.querySelector('.hero');
-  if (hero && hasFinePointer) {
-    window.addEventListener(
-      'scroll',
-      () => {
-        const offset = window.scrollY;
-        if (offset < window.innerHeight) {
-          const grid = hero.querySelector('.hero-grid');
-          if (grid) grid.style.transform = `translateY(${offset * 0.15}px)`;
-        }
-      },
-      { passive: true }
-    );
-  }
-
-
-  /* ============================================================
-     21. IMAGE MODAL — full-screen gallery viewer
+     15. IMAGE MODAL — full-screen gallery viewer
      ============================================================ */
   const imageModal      = document.getElementById('imageModal');
   const imageModalImg   = document.getElementById('imageModalImg');
@@ -1378,14 +1234,12 @@
   if (imageModalPrev) imageModalPrev.addEventListener('click', () => navigateImage(-1));
   if (imageModalNext) imageModalNext.addEventListener('click', () => navigateImage(1));
 
-  // Keyboard arrows while image modal is open
   document.addEventListener('keydown', (e) => {
     if (!imageModal || !imageModal.classList.contains('open')) return;
     if (e.key === 'ArrowLeft')  navigateImage(-1);
     if (e.key === 'ArrowRight') navigateImage(1);
   });
 
-  // Touch swipe on mobile
   if (imageModal) {
     let touchStartX = 0;
     let touchStartY = 0;
@@ -1398,21 +1252,18 @@
     imageModal.addEventListener('touchend', (e) => {
       const dx = e.changedTouches[0].screenX - touchStartX;
       const dy = e.changedTouches[0].screenY - touchStartY;
-      // Only treat as swipe if horizontal movement dominates
       if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
         navigateImage(dx < 0 ? 1 : -1);
       }
     }, { passive: true });
   }
 
-  // Auto-wire project thumbnails → open image modal
   document.querySelectorAll('.featured-project-thumb').forEach((thumb) => {
     const img = thumb.querySelector('img');
     if (!img) return;
 
     thumb.style.cursor = 'zoom-in';
     thumb.addEventListener('click', (e) => {
-      // Don't hijack clicks on status pills or flag badges
       if (e.target.closest('.project-status, .featured-flag')) return;
 
       const card    = thumb.closest('.featured-project-card');
@@ -1431,7 +1282,7 @@
 
 
   /* ============================================================
-     22. TERMINAL MODAL — code sample viewer
+     16. TERMINAL MODAL — code sample viewer
      ============================================================ */
   const terminalModal = document.getElementById('terminalModal');
   const terminalTitle = document.getElementById('terminalTitle');
@@ -1451,7 +1302,6 @@
     openModal(terminalModal);
   };
 
-  // Auto-wire any element with a data-open-terminal attribute
   document.querySelectorAll('[data-open-terminal]').forEach((el) => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
@@ -1467,7 +1317,7 @@
 
 
   /* ============================================================
-     23. PUBLIC API
+     17. PUBLIC API
      ============================================================ */
   window.QOECH = {
     openImageModal,
@@ -1475,5 +1325,138 @@
     openModal,
     closeModal
   };
+
+
+  /* ============================================================
+     18. UNIFIED SCROLL LOOP
+     All scroll-driven work runs from one rAF-scheduled tick.
+     Fires at most once per animation frame — no more six
+     separate scroll listeners racing each other.
+     ============================================================ */
+
+  const scrollProgressEl = document.getElementById('scrollProgress');
+  const navbarEl         = document.getElementById('navbar');
+  const backToTopEl      = document.getElementById('backToTop');
+  const heroEl           = document.querySelector('.hero');
+  const statsGridEl      = document.querySelector('.stats-grid');
+  const statNumbersAll   = document.querySelectorAll('.stat-number');
+  const sectionList      = document.querySelectorAll('section[id]');
+  const navLinkEls       = document.querySelectorAll('.nav-link');
+
+  // ---- Progress bar ----
+  const updateProgressBar = () => {
+    if (!scrollProgressEl) return;
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    scrollProgressEl.style.width = pct + '%';
+  };
+
+  // ---- Navbar scrolled state ----
+  const updateNavbarState = () => {
+    if (!navbarEl) return;
+    navbarEl.classList.toggle('scrolled', window.scrollY > 40);
+  };
+
+  // ---- Active nav link ----
+  const updateActiveLink = () => {
+    if (!sectionList.length) return;
+    const scrollPos = window.scrollY + 160;
+    let currentId = '';
+
+    sectionList.forEach((section) => {
+      const top = section.offsetTop;
+      const height = section.clientHeight;
+      if (scrollPos >= top && scrollPos < top + height) {
+        currentId = section.getAttribute('id');
+      }
+    });
+
+    navLinkEls.forEach((link) => {
+      const href = link.getAttribute('href');
+      link.classList.toggle('active', href === '#' + currentId);
+    });
+  };
+
+  // ---- Back to top visibility ----
+  const updateBackToTop = () => {
+    if (!backToTopEl) return;
+    backToTopEl.classList.toggle('visible', window.scrollY > 500);
+  };
+
+  // ---- Subtle hero grid parallax (desktop only) ----
+  const updateHeroParallax = () => {
+    if (!heroEl || !hasFinePointer) return;
+    const offset = window.scrollY;
+    if (offset > window.innerHeight) return;
+    const grid = heroEl.querySelector('.hero-grid');
+    if (grid) grid.style.transform = `translateY(${offset * 0.15}px)`;
+  };
+
+  // ---- Stats counter (fires once) ----
+  let statsAnimated = false;
+  const runStatsAnimation = () => {
+    statNumbersAll.forEach((el) => {
+      const target = parseInt(el.getAttribute('data-target'), 10) || 0;
+      const suffix = el.getAttribute('data-suffix') || '';
+      const duration = 1600;
+      const startTime = performance.now();
+
+      const tick = (now) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const value = Math.floor(eased * target);
+        el.textContent = value + suffix;
+        if (progress < 1) requestAnimationFrame(tick);
+        else el.textContent = target + suffix;
+      };
+      requestAnimationFrame(tick);
+    });
+  };
+
+  const maybeAnimateStats = () => {
+    if (statsAnimated || !statsGridEl) return;
+    const rect = statsGridEl.getBoundingClientRect();
+    if (rect.top < window.innerHeight - 80) {
+      statsAnimated = true;
+      runStatsAnimation();
+    }
+  };
+
+  // ---- Single rAF-throttled scroll handler ----
+  let scrollTicking = false;
+  const handleScroll = () => {
+    if (scrollTicking) return;
+    scrollTicking = true;
+
+    window.requestAnimationFrame(() => {
+      updateProgressBar();
+      updateNavbarState();
+      updateActiveLink();
+      updateBackToTop();
+      updateHeroParallax();
+      maybeAnimateStats();
+      scrollTicking = false;
+    });
+  };
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+
+  // Run once on load so the initial state is correct
+  window.addEventListener('load', () => {
+    updateProgressBar();
+    updateNavbarState();
+    updateActiveLink();
+    updateBackToTop();
+    maybeAnimateStats();
+  });
+
+  // Back-to-top button
+  if (backToTopEl) {
+    backToTopEl.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 
 })();
