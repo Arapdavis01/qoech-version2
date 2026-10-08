@@ -3246,12 +3246,16 @@ body.menu-open .navbar {
   }
   .navbar.scrolled { top: 8px; }
 
-  .brand-q { height: 26px; margin-left: 0; margin-right: 0.1rem; }
-  .brand-letters { font-size: 1.15rem; letter-spacing: 0.14em; }
-  .brand-sub { font-size: 0.5rem; letter-spacing: 0.28em; margin-left: 0.9em; }
+  /* ---- Brand: mobile scaling for the crop-wrapper approach ---- */
+  .brand-q-wrap { width: 30px; height: 30px; transform: translateY(-2px); }
+  .brand-q { transform: scale(1.7); }
+  .brand:hover .brand-q { transform: scale(1.7) rotate(-4deg); }
+  .brand-letters { font-size: 1.15rem; letter-spacing: 0.12em; }
+  .brand-sub { font-size: 0.5rem; letter-spacing: 0.28em; margin-left: calc(30px + 0.05rem); }
 
+  /* ---- Preloader: scale kept, size handled by crop wrapper ---- */
   .preloader-text { font-size: 1.3rem; }
-  .preloader-q { height: 52px; width: 52px; transform: scale(1.05); }
+  .preloader-q { transform: scale(1.7); }
   .preloader-readout { font-size: 0.6rem; }
 
   .hero { padding: calc(var(--nav-height) + 4rem) 0 5rem; }
@@ -3262,7 +3266,7 @@ body.menu-open .navbar {
   .hero-actions .btn { flex: 1; justify-content: center; }
   .visual-stage { width: 260px; height: 260px; }
   .visual-core { width: 110px; height: 110px; }
-  .visual-core-mark { width: 100%; height: 100%; transform: scale(1); }
+  .visual-core-mark { width: 100%; height: 100%; transform: scale(1.7); }
   .orbit-node { width: 32px; height: 32px; font-size: 0.8rem; top: -16px; }
   .trust-divider { display: none; }
   .hero-trust { gap: 1.75rem; }
@@ -3277,7 +3281,7 @@ body.menu-open .navbar {
 
   .about-card { padding: 1.75rem 1.5rem; }
   .about-card-mark { width: 52px; height: 52px; }
-  .footer-q { height: 28px; width: 28px; transform: scale(1.05); }
+  .footer-q { height: 28px; width: 28px; transform: scale(1.5); }
 
   .section-head { margin-bottom: 2.75rem; }
   .section-label { font-size: 0.6rem; padding: 0.35rem 0.85rem; }
@@ -3333,7 +3337,6 @@ body.menu-open .navbar {
   .thumb-scan { display: none; }
   .footer-scanline { display: none; }
 }
-
 
 /* ============================================================
    28. CONTACT WIZARD
