@@ -12,7 +12,7 @@
    08. Particles Background
    09. Navbar (floating pill + letter-Q brand)
    10. Animated Hamburger + Mobile Menu
-   11. Hero (with image background layer)
+   11. Hero (with layered photo background)
    12. About
    13. Services
    14. Solutions
@@ -27,7 +27,7 @@
    23. Back to Top
    24. Modals (Service + Project)
    25. Fade-up Scroll Animations
-   26. Qoech Mark Sizing
+   26. Qoech Mark Sizing (transparent-PNG aware)
    27. Responsive Breakpoints
    28. Contact Wizard
    29. Digital Layer (grain, status, brackets, dividers, watermarks)
@@ -50,6 +50,7 @@
 :root {
   --bg-body:        #FFFFFF;
   --bg-section:     #FAFBFC;
+  --bg-section-translucent: rgba(250, 251, 252, 0.72);
   --bg-subtle:      #F4F6F8;
   --bg-card:        #FFFFFF;
   --bg-card-hover:  #FFFFFF;
@@ -188,13 +189,13 @@ strong { font-weight: 600; color: var(--text-heading); }
 .section {
   position: relative;
   padding: 7.5rem 0;
-  background: var(--bg-body);
+  background: transparent;
   z-index: 1;
   overflow: hidden;
 }
 
 .section-alt {
-  background: var(--bg-section);
+  background: var(--bg-section-translucent);
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
 }
@@ -340,7 +341,6 @@ strong { font-weight: 600; color: var(--text-heading); }
 .btn-shine:hover::before { left: 100%; }
 .btn-shine > * { position: relative; z-index: 2; }
 
-/* Rocket icon shake on hover */
 .btn-shine:hover .fa-rocket { animation: rocketShake 0.6s ease; }
 @keyframes rocketShake {
   0%, 100% { transform: translateY(0) rotate(0); }
@@ -404,6 +404,7 @@ strong { font-weight: 600; color: var(--text-heading); }
   filter: drop-shadow(0 4px 12px rgba(22, 163, 74, 0.18));
   animation: preloaderPulse 2s ease-in-out infinite;
 }
+.preloader-q.logo-transparent { mix-blend-mode: normal; }
 
 .preloader-text {
   margin-top: 2rem;
@@ -555,6 +556,7 @@ strong { font-weight: 600; color: var(--text-heading); }
   user-select: none;
   mix-blend-mode: multiply;
 }
+.brand-q.logo-transparent { mix-blend-mode: normal; }
 .brand:hover .brand-q {
   transform: translateY(1px) rotate(-4deg);
 }
@@ -889,7 +891,7 @@ body.menu-open .navbar {
   z-index: 1;
 }
 
-/* Layer 1 — subtle tech photo */
+/* Layer 1 — subtle tech photo (now actually visible) */
 .hero-image-bg {
   position: absolute;
   inset: 0;
@@ -897,20 +899,19 @@ body.menu-open .navbar {
   background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
-  opacity: 0.045;
-  mix-blend-mode: multiply;
+  opacity: 0.12;
   pointer-events: none;
 }
 
-/* Layer 2 — gradient washes */
+/* Layer 2 — semi-transparent gradient washes */
 .hero-bg {
   position: absolute;
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(22, 163, 74, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 60% at 85% 80%, rgba(166, 124, 62, 0.06) 0%, transparent 60%),
-    linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(22, 163, 74, 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 60% at 85% 80%, rgba(166, 124, 62, 0.08) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 252, 0.92) 100%);
 }
 
 /* Layer 3 — grid overlay */
@@ -1261,7 +1262,6 @@ body.menu-open .navbar {
   50% { transform: translateX(-50%) translateY(6px); }
 }
 
-/* Hero bottom ticker */
 .hero-ticker {
   position: absolute;
   bottom: 0;
@@ -2047,7 +2047,7 @@ body.menu-open .navbar {
 
 .capabilities {
   padding: 2.75rem 2.25rem;
-  background: linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(250, 251, 252, 0.88) 100%);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
   position: relative;
@@ -2064,7 +2064,7 @@ body.menu-open .navbar {
   background: linear-gradient(90deg, var(--primary), var(--gold));
 }
 
-.capabilities-head { text-align: center; margin-bottom: 2rem; }
+.capabilities-head { text-align: center; margin-bottom: 2rem; position: relative; z-index: 2; }
 .capabilities-head h3 { font-size: 1.25rem; letter-spacing: -0.015em; margin-bottom: 0.4rem; }
 .capabilities-head p { font-size: 0.875rem; color: var(--text-muted); max-width: 520px; margin: 0 auto; }
 
@@ -2073,6 +2073,8 @@ body.menu-open .navbar {
   grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
   margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
 }
 
 .capability-item {
@@ -2097,7 +2099,7 @@ body.menu-open .navbar {
   box-shadow: var(--shadow-sm);
 }
 
-.capabilities-cta { text-align: center; }
+.capabilities-cta { text-align: center; position: relative; z-index: 2; }
 
 
 /* ============================================================
@@ -2295,7 +2297,7 @@ body.menu-open .navbar {
 .eagle-section {
   position: relative;
   padding: 10rem 0;
-  background: linear-gradient(180deg, #FFFFFF 0%, #0B1220 20%, #0B1220 80%, #FFFFFF 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, #0B1220 20%, #0B1220 80%, rgba(255, 255, 255, 0.85) 100%);
   overflow: hidden;
   text-align: center;
   z-index: 1;
@@ -3071,6 +3073,9 @@ body.menu-open .navbar {
 
 /* ============================================================
    26. QOECH MARK SIZING
+   Once the JS white-stripper swaps in the transparent PNG,
+   the .logo-transparent class drops mix-blend-mode so the
+   colour rendition stays clean.
    ============================================================ */
 .footer-q,
 .preloader-q,
@@ -3086,6 +3091,12 @@ body.menu-open .navbar {
   mix-blend-mode: multiply;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+}
+.footer-q.logo-transparent,
+.preloader-q.logo-transparent,
+.visual-core-mark.logo-transparent,
+.about-card-mark img.logo-transparent {
+  mix-blend-mode: normal;
 }
 
 .preloader-q {
@@ -3971,7 +3982,7 @@ body.menu-open .navbar {
   opacity: 0.9;
 }
 
-/* ---- Section banner image behind section heads ---- */
+/* ---- Section banner image behind section heads (visible) ---- */
 .section-banner-bg {
   position: absolute;
   top: 0;
@@ -3982,8 +3993,7 @@ body.menu-open .navbar {
   background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=1920&q=80&auto=format&fit=crop');
   background-size: cover;
   background-position: center top;
-  opacity: 0.06;
-  mix-blend-mode: multiply;
+  opacity: 0.14;
   pointer-events: none;
   mask-image: linear-gradient(180deg, black 0%, transparent 100%);
   -webkit-mask-image: linear-gradient(180deg, black 0%, transparent 100%);
@@ -3994,7 +4004,7 @@ body.menu-open .navbar {
   z-index: 1;
 }
 
-/* ---- Capabilities inner background image ---- */
+/* ---- Capabilities inner background image (visible) ---- */
 .capabilities-bg {
   position: absolute;
   inset: 0;
@@ -4002,8 +4012,7 @@ body.menu-open .navbar {
   background-image: url('https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1600&q=80&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
-  opacity: 0.045;
-  mix-blend-mode: multiply;
+  opacity: 0.12;
   pointer-events: none;
   border-radius: inherit;
 }
