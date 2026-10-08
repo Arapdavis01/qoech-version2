@@ -16,12 +16,15 @@
    12. About Tabs
    13. Service Data + Modal
    14. Project Data + Modal
-   15. Modal Helpers (close, escape, overlay)
+   15. Modal Helpers (close, escape, overlay, delegation)
    16. Testimonial Carousel
    17. Contact Wizard (Request a System)
    18. Back to Top
    19. Footer Year
    20. Hero Parallax (subtle)
+   21. Image Modal — full-screen gallery viewer
+   22. Terminal Modal — code sample viewer
+   23. Public API (window.QOECH)
    ============================================================ */
 
 (function () {
@@ -74,7 +77,6 @@
       cursorGlow.style.opacity = '0.85';
     });
 
-    // Smooth follow with requestAnimationFrame
     const animateCursor = () => {
       cx += (tx - cx) * 0.22;
       cy += (ty - cy) * 0.22;
@@ -161,7 +163,6 @@
     });
   };
 
-  // Wait for tsParticles to be available (loaded with defer)
   if (typeof tsParticles !== 'undefined') {
     initParticles();
   } else {
@@ -218,7 +219,6 @@
     });
   }
 
-  // Close button inside the mobile menu panel
   if (navClose) {
     navClose.addEventListener('click', closeMenu);
   }
@@ -231,14 +231,12 @@
     link.addEventListener('click', closeMenu);
   });
 
-  // Close on Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && hamburger && hamburger.classList.contains('open')) {
       closeMenu();
     }
   });
 
-  // Close on resize above breakpoint
   window.addEventListener('resize', () => {
     if (window.innerWidth > 1024 && hamburger && hamburger.classList.contains('open')) {
       closeMenu();
@@ -291,7 +289,6 @@
       const top = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
       window.scrollTo({ top, behavior: 'smooth' });
 
-      // Update URL hash without jumping
       history.replaceState(null, '', targetId);
     });
   });
@@ -329,7 +326,7 @@
       let speed = isDeleting ? 45 : 90;
 
       if (!isDeleting && charIndex === current.length) {
-        speed = 1800; // pause at end
+        speed = 1800;
         isDeleting = true;
       } else if (isDeleting && charIndex === 0) {
         isDeleting = false;
@@ -340,7 +337,6 @@
       setTimeout(typeLoop, speed);
     };
 
-    // Start after preloader
     setTimeout(typeLoop, 1400);
   }
 
@@ -349,10 +345,12 @@
      10. FADE-UP SCROLL ANIMATIONS
      ============================================================ */
   const fadeEls = document.querySelectorAll(
-    '.fade-up, .section-head, .service-card, .solution-card, ' +
+    '.fade-up, .section-head, .section-divider, ' +
+    '.service-card, .solution-card, ' +
     '.featured-project-card, .other-system-item, .capability-item, ' +
     '.tech-category, .why-card, .process-step, .stat-card, ' +
-    '.value-item, .contact-card, .testimonial-carousel'
+    '.value-item, .contact-card, .testimonial-carousel, ' +
+    '.eagle-readout'
   );
 
   if ('IntersectionObserver' in window) {
@@ -392,7 +390,6 @@
       const tick = (now) => {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        // easeOutCubic
         const eased = 1 - Math.pow(1 - progress, 3);
         const value = Math.floor(eased * target);
         el.textContent = value + suffix;
@@ -691,7 +688,7 @@
       status: 'Live',
       statusClass: 'status-live',
       image: 'images/projects/hardware.jpg',
-      liveUrl: '', // ← paste live URL here when available
+      liveUrl: '',
       overview: 'A management system built for hardware stores that need to manage large product catalogs, track sales and monitor stock levels without spreadsheets.',
       problem: 'Hardware stores deal with hundreds of products, varying units and fast-moving stock. Manual tracking leads to stockouts, overstocking and difficulty knowing what is actually selling.',
       solution: 'We built a system that handles inventory tracking, sales processing, purchase recording and business reporting — designed around how hardware stores actually operate.',
@@ -712,7 +709,7 @@
       status: 'Live',
       statusClass: 'status-live',
       image: 'images/projects/agrovet.jpg',
-      liveUrl: '', // ← paste live URL here when available
+      liveUrl: '',
       overview: 'A complete system for tracking sales, stock levels, purchases and inventory in agrovet businesses.',
       problem: 'Agrovet businesses struggled with manual inventory tracking, leading to stockouts, overstocking and difficulty reconciling sales and purchases.',
       solution: 'We developed a full inventory management system with real-time stock tracking, sales recording, purchase management and reporting.',
@@ -837,7 +834,6 @@
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
 
-    // Focus first focusable element
     const focusable = modal.querySelector('button, [href], input, select, textarea');
     if (focusable) setTimeout(() => focusable.focus(), 80);
   }
@@ -847,26 +843,28 @@
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden', 'true');
 
-    // Only unlock scroll if no other modal is open
     const anyOpen = document.querySelector('.modal.open');
     if (!anyOpen) document.body.style.overflow = '';
 
     if (lastFocusedEl && lastFocusedEl.focus) lastFocusedEl.focus();
   }
 
-  // Close buttons inside modals (data-close attribute)
-  document.querySelectorAll('.modal').forEach((modal) => {
-    modal.querySelectorAll('[data-close]').forEach((el) => {
-      el.addEventListener('click', (e) => {
-        // If it's a link to #contact, let it scroll first
-        if (el.tagName === 'A' && el.getAttribute('href') === '#contact') {
-          closeModal(modal);
-        } else {
-          e.preventDefault();
-          closeModal(modal);
-        }
-      });
-    });
+  // Event delegation — handles [data-close] even on dynamically injected content
+  document.addEventListener('click', (e) => {
+    const closeBtn = e.target.closest('[data-close]');
+    if (!closeBtn) return;
+
+    const modal = closeBtn.closest('.modal');
+    if (!modal) return;
+
+    // If it's a link to #contact, let the default smooth-scroll run, then close
+    if (closeBtn.tagName === 'A' && closeBtn.getAttribute('href') === '#contact') {
+      closeModal(modal);
+      return;
+    }
+
+    e.preventDefault();
+    closeModal(modal);
   });
 
   // Escape key closes any open modal
@@ -952,7 +950,6 @@
 
   if (wizardForm) {
 
-    /* ---------- Fields list for save/restore ---------- */
     const fieldNames = [
       'full_name', 'email', 'phone', 'company', 'location',
       'system_type', 'title', 'description',
@@ -960,7 +957,6 @@
       'reference_urls', 'source'
     ];
 
-    /* ---------- sessionStorage draft ---------- */
     const saveDraft = () => {
       try {
         const data = {};
@@ -988,17 +984,13 @@
       try { sessionStorage.removeItem(STORAGE_KEY); } catch (_) {}
     };
 
-    /* ---------- Step navigation ----------
-       scroll = true  → scroll to the form (user navigated)
-       scroll = false → don't scroll (initial page load)
-    ----------------------------------------- */
     const showStep = (step, direction, scroll = true) => {
       wizardSteps.forEach((el) => {
         const s = parseInt(el.dataset.step, 10);
         el.classList.remove('active', 'leaving-back');
         if (s === step) {
           el.setAttribute('aria-hidden', 'false');
-          void el.offsetWidth; // restart animation
+          void el.offsetWidth;
           el.classList.add('active');
           if (direction === 'back') el.classList.add('leaving-back');
         } else {
@@ -1019,15 +1011,12 @@
 
       if (wizardProgress) wizardProgress.setAttribute('aria-valuenow', String(step));
 
-      // Focus first field on step change — preventScroll stops the browser
-      // from jumping the page to the input on initial load
       const activeEl = wizardForm.querySelector('.wizard-step.active');
       if (activeEl) {
         const firstInput = activeEl.querySelector('input:not(.hp-field), select, textarea');
         if (firstInput) setTimeout(() => firstInput.focus({ preventScroll: true }), 120);
       }
 
-      // Scroll form top into view — ONLY when user navigates steps
       if (scroll) {
         const formWrap = wizardForm.closest('.contact-form-wrap');
         if (formWrap) {
@@ -1037,7 +1026,6 @@
       }
     };
 
-    /* ---------- Error helpers ---------- */
     const setFieldError = (name, message) => {
       const input = wizardForm.elements[name];
       const errEl = wizardForm.querySelector(`.field-error[data-error-for="${name}"]`);
@@ -1066,7 +1054,6 @@
       }
     };
 
-    /* ---------- Validation ---------- */
     const isValidEmail = (v) =>
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v).trim());
 
@@ -1119,7 +1106,6 @@
       return ok;
     };
 
-    /* ---------- Step buttons ---------- */
     wizardForm.addEventListener('click', (e) => {
       const nextBtn = e.target.closest('.wizard-next');
       const backBtn = e.target.closest('.wizard-back');
@@ -1127,21 +1113,19 @@
       if (nextBtn) {
         if (!validateStep(currentStep)) return;
         currentStep = Math.min(currentStep + 1, TOTAL_STEPS);
-        showStep(currentStep, 'forward');   // scrolls (default true)
+        showStep(currentStep, 'forward');
         saveDraft();
       }
 
       if (backBtn) {
         currentStep = Math.max(currentStep - 1, 1);
-        showStep(currentStep, 'back');      // scrolls (default true)
+        showStep(currentStep, 'back');
       }
     });
 
-    /* ---------- Persist input changes ---------- */
     wizardForm.addEventListener('input', saveDraft);
     wizardForm.addEventListener('change', saveDraft);
 
-    /* ---------- Build payload ---------- */
     const buildPayload = () => {
       const get = (n) => {
         const el = wizardForm.elements[n];
@@ -1166,7 +1150,6 @@
       };
     };
 
-    /* ---------- Submit loading state ---------- */
     const setSubmitting = (isSubmitting) => {
       if (!wizardSubmit) return;
 
@@ -1197,7 +1180,6 @@
       wizardStatus.textContent = message;
     };
 
-    /* ---------- Success screen ---------- */
     const showSuccess = (referenceCode) => {
       wizardSteps.forEach((el) => {
         el.classList.remove('active');
@@ -1221,18 +1203,15 @@
       }
     };
 
-    /* ---------- Submit handler ---------- */
     wizardForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       clearAllErrors();
 
-      // Honeypot
       if (hpWebsite && hpWebsite.value.trim() !== '') {
         showSuccess('SYS-0000-0000');
         return;
       }
 
-      // Validate every step
       for (let s = 1; s <= TOTAL_STEPS; s++) {
         if (!validateStep(s)) {
           currentStep = s;
@@ -1284,7 +1263,6 @@
       }
     });
 
-    /* ---------- Reset to step 1 ---------- */
     if (successReset) {
       successReset.addEventListener('click', () => {
         wizardForm.reset();
@@ -1302,9 +1280,6 @@
       });
     }
 
-    /* ---------- Init ----------
-       scroll = false → don't auto-scroll to the form on page load
-    ------------------------------- */
     restoreDraft();
     showStep(1, 'forward', false);
   }
@@ -1352,5 +1327,153 @@
       { passive: true }
     );
   }
+
+
+  /* ============================================================
+     21. IMAGE MODAL — full-screen gallery viewer
+     ============================================================ */
+  const imageModal      = document.getElementById('imageModal');
+  const imageModalImg   = document.getElementById('imageModalImg');
+  const imageModalMeta  = document.getElementById('imageModalMeta');
+  const imageModalTitle = document.getElementById('imageModalTitle');
+  const imageModalDesc  = document.getElementById('imageModalDesc');
+  const imageModalPrev  = imageModal ? imageModal.querySelector('[data-nav="prev"]') : null;
+  const imageModalNext  = imageModal ? imageModal.querySelector('[data-nav="next"]') : null;
+
+  let imageGallery = [];
+  let imageIndex = 0;
+
+  const renderImageModal = () => {
+    if (!imageGallery.length || !imageModalImg) return;
+    const item = imageGallery[imageIndex] || {};
+
+    imageModalImg.src = item.src || '';
+    imageModalImg.alt = item.alt || item.title || '';
+
+    if (imageModalMeta)  imageModalMeta.textContent  = item.meta  || '';
+    if (imageModalTitle) imageModalTitle.textContent = item.title || '';
+    if (imageModalDesc)  imageModalDesc.textContent  = item.desc  || '';
+
+    const multi = imageGallery.length > 1;
+    if (imageModalPrev) imageModalPrev.style.display = multi ? '' : 'none';
+    if (imageModalNext) imageModalNext.style.display = multi ? '' : 'none';
+  };
+
+  const openImageModal = (images, startIndex = 0) => {
+    if (!imageModal || !images || !images.length) return;
+
+    imageGallery = Array.isArray(images) ? images : [images];
+    imageIndex = Math.max(0, Math.min(startIndex, imageGallery.length - 1));
+
+    renderImageModal();
+    openModal(imageModal);
+  };
+
+  const navigateImage = (dir) => {
+    if (imageGallery.length < 2) return;
+    imageIndex = (imageIndex + dir + imageGallery.length) % imageGallery.length;
+    renderImageModal();
+  };
+
+  if (imageModalPrev) imageModalPrev.addEventListener('click', () => navigateImage(-1));
+  if (imageModalNext) imageModalNext.addEventListener('click', () => navigateImage(1));
+
+  // Keyboard arrows while image modal is open
+  document.addEventListener('keydown', (e) => {
+    if (!imageModal || !imageModal.classList.contains('open')) return;
+    if (e.key === 'ArrowLeft')  navigateImage(-1);
+    if (e.key === 'ArrowRight') navigateImage(1);
+  });
+
+  // Touch swipe on mobile
+  if (imageModal) {
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    imageModal.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    imageModal.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].screenX - touchStartX;
+      const dy = e.changedTouches[0].screenY - touchStartY;
+      // Only treat as swipe if horizontal movement dominates
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+        navigateImage(dx < 0 ? 1 : -1);
+      }
+    }, { passive: true });
+  }
+
+  // Auto-wire project thumbnails → open image modal
+  document.querySelectorAll('.featured-project-thumb').forEach((thumb) => {
+    const img = thumb.querySelector('img');
+    if (!img) return;
+
+    thumb.style.cursor = 'zoom-in';
+    thumb.addEventListener('click', (e) => {
+      // Don't hijack clicks on status pills or flag badges
+      if (e.target.closest('.project-status, .featured-flag')) return;
+
+      const card    = thumb.closest('.featured-project-card');
+      const titleEl = card ? card.querySelector('h3') : null;
+      const catEl   = card ? card.querySelector('.project-category') : null;
+
+      openImageModal([{
+        src: img.getAttribute('src'),
+        alt: img.getAttribute('alt') || '',
+        meta: catEl ? catEl.textContent.trim() : 'Project',
+        title: titleEl ? titleEl.textContent.trim() : (img.getAttribute('alt') || ''),
+        desc: 'Click outside or press ESC to close.'
+      }], 0);
+    });
+  });
+
+
+  /* ============================================================
+     22. TERMINAL MODAL — code sample viewer
+     ============================================================ */
+  const terminalModal = document.getElementById('terminalModal');
+  const terminalTitle = document.getElementById('terminalTitle');
+  const terminalCode  = document.getElementById('terminalCode');
+
+  const escapeHtml = (str) => String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const openTerminalModal = ({ title = '~/qoech/project', code = '' } = {}) => {
+    if (!terminalModal) return;
+
+    if (terminalTitle) terminalTitle.textContent = title;
+    if (terminalCode)  terminalCode.innerHTML    = escapeHtml(code);
+
+    openModal(terminalModal);
+  };
+
+  // Auto-wire any element with a data-open-terminal attribute
+  document.querySelectorAll('[data-open-terminal]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const raw = el.getAttribute('data-open-terminal') || '{}';
+      try {
+        const payload = JSON.parse(raw);
+        openTerminalModal(payload);
+      } catch (_) {
+        openTerminalModal({ code: raw });
+      }
+    });
+  });
+
+
+  /* ============================================================
+     23. PUBLIC API
+     ============================================================ */
+  window.QOECH = {
+    openImageModal,
+    openTerminalModal,
+    openModal,
+    closeModal
+  };
 
 })();
