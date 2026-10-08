@@ -533,45 +533,48 @@ strong { font-weight: 600; color: var(--text-heading); }
   flex-shrink: 0;
 }
 
+/* Bottom-align Q and OECH so they share a baseline */
 .brand-top {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-end;
   line-height: 1;
+  gap: 0.06rem;
 }
 
+/* Letter Q — taller than OECH, sits on the same baseline */
 .brand-q {
-  height: 32px;
+  height: 38px;
   width: auto;
   display: block;
   flex-shrink: 0;
   object-fit: contain;
-  margin-right: 0.1rem;
-  margin-left: 0;
-  transform: translateY(2px);
+  margin: 0;
+  transform: translateY(-4px);
   transition: var(--transition);
   -webkit-user-drag: none;
   user-select: none;
 }
 .brand:hover .brand-q {
-  transform: translateY(2px) rotate(-4deg);
+  transform: translateY(-4px) rotate(-4deg);
 }
 
 .brand-letters {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.35rem;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   color: var(--text-heading);
   line-height: 1;
 }
 
+/* TECHNOLOGIES aligns under OECH, not under the Q */
 .brand-sub {
   font-family: var(--font-mono);
   font-size: 0.55rem;
   font-weight: 500;
   letter-spacing: 0.32em;
   color: var(--primary-dark);
-  margin-left: 0.95em;
+  margin-left: calc(38px + 0.06rem);
   line-height: 1;
 }
 
@@ -683,7 +686,6 @@ strong { font-weight: 600; color: var(--text-heading); }
   transform: translateY(-1px);
   box-shadow: var(--shadow-brand);
 }
-
 
 /* ============================================================
    10. HAMBURGER + MOBILE MENU
