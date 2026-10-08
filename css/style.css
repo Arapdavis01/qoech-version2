@@ -2752,25 +2752,25 @@ body.menu-open .navbar {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.14;
+  opacity: 0.35;
   pointer-events: none;
 }
 
-/* Layer 2 — soft white wash on top so text stays crisp */
+/* Layer 2 — lighter white wash so the texture reads through */
 .footer-bg-overlay {
   position: absolute;
   inset: 0;
   z-index: -1;
   background: linear-gradient(
     180deg,
-    rgba(250, 251, 252, 0.88) 0%,
-    rgba(250, 251, 252, 0.82) 50%,
-    rgba(250, 251, 252, 0.90) 100%
+    rgba(250, 251, 252, 0.55) 0%,
+    rgba(250, 251, 252, 0.45) 50%,
+    rgba(250, 251, 252, 0.60) 100%
   );
   pointer-events: none;
 }
 
-/* Animated top scanline (kept from before) */
+/* Animated top scanline */
 .footer-scanline {
   position: absolute;
   top: 0;
@@ -2974,7 +2974,6 @@ body.menu-open .navbar {
   color: var(--primary-dark);
 }
 .mono-val-ok .status-dot { width: 5px; height: 5px; }
-
 /* ============================================================
    23. BACK TO TOP
    ============================================================ */
