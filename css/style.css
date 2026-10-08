@@ -2731,7 +2731,7 @@ body.menu-open .navbar {
 
 
 /* ============================================================
-   22. FOOTER
+   22. FOOTER — with background texture
    ============================================================ */
 .footer {
   background: var(--bg-section);
@@ -2740,8 +2740,37 @@ body.menu-open .navbar {
   position: relative;
   z-index: 2;
   overflow: hidden;
+  isolation: isolate;
 }
 
+/* Layer 1 — background photo/texture */
+.footer-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=1920&q=80&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.14;
+  pointer-events: none;
+}
+
+/* Layer 2 — soft white wash on top so text stays crisp */
+.footer-bg-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    rgba(250, 251, 252, 0.88) 0%,
+    rgba(250, 251, 252, 0.82) 50%,
+    rgba(250, 251, 252, 0.90) 100%
+  );
+  pointer-events: none;
+}
+
+/* Animated top scanline (kept from before) */
 .footer-scanline {
   position: absolute;
   top: 0;
@@ -2755,6 +2784,7 @@ body.menu-open .navbar {
     transparent 100%);
   opacity: 0.35;
   animation: footerScan 8s ease-in-out infinite;
+  z-index: 3;
 }
 @keyframes footerScan {
   0%, 100% { transform: translateX(-30%); }
@@ -2766,6 +2796,8 @@ body.menu-open .navbar {
   grid-template-columns: 1.6fr 1fr 1fr 1fr;
   gap: 3rem;
   margin-bottom: 2.75rem;
+  position: relative;
+  z-index: 2;
 }
 
 .footer-logo {
@@ -2781,7 +2813,7 @@ body.menu-open .navbar {
 .footer-q {
   height: 34px;
   width: 34px;
-  transform: scale(1.05);
+  transform: scale(1.5);
   margin-right: 0.1rem;
   filter: drop-shadow(0 2px 6px rgba(22, 163, 74, 0.20));
 }
@@ -2829,7 +2861,7 @@ body.menu-open .navbar {
   gap: 0.5rem;
   margin-top: 1rem;
   padding: 0.4rem 0.85rem;
-  background: #FFFFFF;
+  background: rgba(255, 255, 255, 0.75);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-pill);
   font-family: var(--font-mono);
@@ -2839,6 +2871,8 @@ body.menu-open .navbar {
   text-transform: uppercase;
   color: var(--text-secondary);
   box-shadow: var(--shadow-xs);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 .footer-status .status-dot { width: 6px; height: 6px; }
 
@@ -2878,12 +2912,14 @@ body.menu-open .navbar {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #FFFFFF;
+  background: rgba(255, 255, 255, 0.85);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   font-size: 0.85rem;
   transition: var(--transition);
   box-shadow: var(--shadow-xs);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 .footer-social a:hover {
   background: var(--text-heading);
@@ -2901,6 +2937,8 @@ body.menu-open .navbar {
   gap: 0.6rem;
   padding-top: 1.75rem;
   border-top: 1px solid var(--border-subtle);
+  position: relative;
+  z-index: 2;
 }
 .footer-bottom p {
   font-size: 0.75rem;
@@ -2936,7 +2974,6 @@ body.menu-open .navbar {
   color: var(--primary-dark);
 }
 .mono-val-ok .status-dot { width: 5px; height: 5px; }
-
 
 /* ============================================================
    23. BACK TO TOP
