@@ -1464,7 +1464,7 @@
   }
 
 
-    /* ============================================================
+  /* ============================================================
      19. EAGLE FLIGHT ANIMATION — full choreography
      ------------------------------------------------------------
      Every cycle:
@@ -1474,9 +1474,9 @@
        perched bob → crouch → turn → glide back → land in ring
        → combined logo restores → repeat.
 
-     Timing (fixed, cursor-independent):
-       • First flight starts 10 seconds after page load
-       • Every subsequent flight repeats every 20 seconds
+     Repeat interval:
+       • Cursor IDLE  (no mousemove for 3s) → every 20 seconds
+       • Cursor ACTIVE                       → every 40 seconds
      ============================================================ */
   (function eagleFlight() {
     const navbar    = document.getElementById('navbar');
@@ -1489,22 +1489,28 @@
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
 
-    /* ---- Timing (ms) — keep T_FLIGHT_* in sync with CSS ---- */
-    const FIRST_DELAY   = 10000;   // first flight: 10s after page load
-    const REPEAT_DELAY  = 20000;   // every flight after that: every 20s
+    /* ---- Timing (ms) — keep in sync with CSS ---- */
+    const CURSOR_IDLE_THRESHOLD = 3000;
+    const REPEAT_IDLE   = 20000;
+    const REPEAT_ACTIVE = 40000;
 
     const T_SHAKE_MS    = 600;
     const T_SWAP_MS     = 400;
-    const T_FLIGHT_OUT  = 6000;    // CSS flyRight duration
-    const T_PILL_MS     = 2600;    // hover + perch + bob
+    const T_FLIGHT_OUT  = 6000;   // CSS flyRight duration
+    const T_PILL_MS     = 2600;   // hover + perch + bob
     const T_CROUCH_MS   = 250;
-    const T_FLIGHT_BACK = 5500;    // CSS flyLeft duration
+    const T_FLIGHT_BACK = 5500;   // CSS flyLeft duration
     const T_RESET_MS    = 600;
+
+    /* ---- Cursor activity ---- */
+    let lastMouseMove = Date.now();
+    document.addEventListener('mousemove', () => { lastMouseMove = Date.now(); }, { passive: true });
+    const isCursorIdle = () => (Date.now() - lastMouseMove) >= CURSOR_IDLE_THRESHOLD;
+    const nextInterval = () => isCursorIdle() ? REPEAT_IDLE : REPEAT_ACTIVE;
 
     /* ---- State ---- */
     let idleTimer = null;
-    let running   = false;
-    let firstRun  = true;
+    let running = false;
 
     /* ---- Helpers ---- */
     const computePositions = () => {
@@ -1559,23 +1565,17 @@
       }, 200);
     };
 
-    /* ---- Arm the next flight ----
-       First call uses FIRST_DELAY (10s after load).
-       Subsequent calls use REPEAT_DELAY (20s). */
-    const armNext = () => {
+    /* ---- Arm the next flight ---- */
+    const armIdle = () => {
       if (running) return;
       clearTimeout(idleTimer);
-      const wait = firstRun ? FIRST_DELAY : REPEAT_DELAY;
-      idleTimer = setTimeout(() => {
-        firstRun = false;
-        runSequence();
-      }, wait);
+      idleTimer = setTimeout(runSequence, nextInterval());
     };
 
     /* ---- The full sequence ---- */
     const runSequence = () => {
       if (running) return;
-      if (window.innerWidth <= 1024) { armNext(); return; }
+      if (window.innerWidth <= 1024) { armIdle(); return; }
       running = true;
 
       const pos = computePositions();
@@ -1612,6 +1612,7 @@
       const tTouchdown = T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT;
 
       setTimeout(() => {
+        /* Stop flight, start landing animation (includes hover) */
         eagle.classList.remove('flying');
         eagle.style.left = pos.endX + 'px';
         eagle.style.top  = (pos.endY - PERCH_OFFSET) + 'px';
@@ -1622,11 +1623,14 @@
       const tImpact = tTouchdown + 350;
 
       setTimeout(() => {
+        /* Status pill reactions */
         navStatus.classList.add('systems-checking');
         swapStatusText('Checking…');
 
+        /* Sparks flung outward from the pill */
         spawnSparks(pos.endX, pos.endY);
 
+        /* Navbar border flashes */
         navbar.classList.add('impact');
         setTimeout(() => navbar.classList.remove('impact'), 500);
       }, tImpact);
@@ -1636,6 +1640,7 @@
 
       setTimeout(() => {
         eagle.classList.add('crouching');
+        /* Crouch is applied relative to current perched pose */
         eagle.style.transform = 'translate(-50%, calc(-50% - 0px)) scale(1.08, 0.86)';
       }, tCrouchStart);
 
@@ -1646,6 +1651,7 @@
         navStatus.classList.remove('systems-checking');
         swapStatusText('Systems Online');
 
+        /* Clear crouch inline styles so flyLeft keyframe takes over */
         eagle.style.transform = '';
         eagle.style.transition = '';
         eagle.classList.remove('crouching', 'perched');
@@ -1679,10 +1685,12 @@
         eagle.style.transition = '';
         eagle.style.removeProperty('--fly-distance');
         running = false;
-        armNext();
+        armIdle();
       }, tLandBack + T_RESET_MS);
     };
 
-    /* Kick off the first cycle — fires 10s after this script runs */
-    armNext();
+    /* Kick off first cycle */
+    armIdle();
   })();
+
+})();
