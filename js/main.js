@@ -29,6 +29,24 @@
   'use strict';
 
   /* ============================================================
+     00. INITIAL SCROLL RESET
+     ------------------------------------------------------------
+     Some mobile browsers still restore a previous scroll position
+     despite `history.scrollRestoration = 'manual'`, and iOS Safari
+     sometimes scrolls to the first focused field on load. This
+     forces the page to the top on every load, and pairs with the
+     wizard's "no auto-focus on load" behaviour (see Section 13).
+     ============================================================ */
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+  window.scrollTo(0, 0);
+  window.addEventListener('load', () => {
+    window.scrollTo(0, 0);
+  });
+
+
+  /* ============================================================
      01. PRELOADER
      ============================================================ */
   window.addEventListener('load', () => {
@@ -896,7 +914,12 @@
       try { sessionStorage.removeItem(STORAGE_KEY); } catch (_) {}
     };
 
-    const showStep = (step, direction, scroll = true) => {
+    /* showStep(step, direction, scroll, focus)
+       - `scroll` controls whether we smooth-scroll the form into view
+       - `focus`  controls whether we auto-focus the first field
+       On initial page load we pass both as `false` so mobile browsers
+       don't scroll down to the contact section on first visit. */
+    const showStep = (step, direction, scroll = true, focus = true) => {
       wizardSteps.forEach((el) => {
         const s = parseInt(el.dataset.step, 10);
         el.classList.remove('active', 'leaving-back');
@@ -923,10 +946,12 @@
 
       if (wizardProgress) wizardProgress.setAttribute('aria-valuenow', String(step));
 
-      const activeEl = wizardForm.querySelector('.wizard-step.active');
-      if (activeEl) {
-        const firstInput = activeEl.querySelector('input:not(.hp-field), select, textarea');
-        if (firstInput) setTimeout(() => firstInput.focus({ preventScroll: true }), 120);
+      if (focus) {
+        const activeEl = wizardForm.querySelector('.wizard-step.active');
+        if (activeEl) {
+          const firstInput = activeEl.querySelector('input:not(.hp-field), select, textarea');
+          if (firstInput) setTimeout(() => firstInput.focus({ preventScroll: true }), 120);
+        }
       }
 
       if (scroll) {
@@ -1193,7 +1218,10 @@
     }
 
     restoreDraft();
-    showStep(1, 'forward', false);
+
+    // On initial load: no scroll, no focus. Prevents mobile browsers
+    // from jumping down to the contact form on first visit.
+    showStep(1, 'forward', false, false);
   }
 
 
