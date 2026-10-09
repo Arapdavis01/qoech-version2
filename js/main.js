@@ -21,6 +21,7 @@
    17. Public API (window.QOECH)
    18. Unified Scroll Loop — progress bar, navbar state,
        active link, back-to-top, hero parallax, stats counter
+   19. Eagle Flight Animation — full choreography
    ============================================================ */
 
 (function () {
@@ -1461,231 +1462,235 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
-    /* ============================================================
-   19. EAGLE FLIGHT ANIMATION — full choreography
-   ------------------------------------------------------------
-   Every cycle:
-     Ring shakes + bubbles → combined logo fades → empty ring
-     → eagle glides right → hover → touchdown (shockwave, sparks,
-     dot ignition, text flash, navbar flash, "Checking…") →
-     perched bob → crouch → turn → glide back → land in ring
-     → combined logo restores → repeat.
 
-   Repeat interval:
-     • Cursor IDLE  (no mousemove for 3s) → every 20 seconds
-     • Cursor ACTIVE                       → every 40 seconds
-   ============================================================ */
-(function eagleFlight() {
-  const navbar    = document.getElementById('navbar');
-  const eagle     = document.getElementById('navFlyingEagle');
-  const burst     = document.getElementById('navBurst');
-  const brandQ    = document.getElementById('brandQ');
-  const navStatus = document.getElementById('navStatus');
-  if (!navbar || !eagle || !burst || !brandQ || !navStatus) return;
 
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduce) return;
+  /* ============================================================
+     19. EAGLE FLIGHT ANIMATION — full choreography
+     ------------------------------------------------------------
+     Every cycle:
+       Ring shakes + bubbles → combined logo fades → empty ring
+       → eagle glides right → hover → touchdown (shockwave, sparks,
+       dot ignition, text flash, navbar flash, "Checking…") →
+       perched bob → crouch → turn → glide back → land in ring
+       → combined logo restores → repeat.
 
-  /* ---- Timing (ms) — keep in sync with CSS ---- */
-  const CURSOR_IDLE_THRESHOLD = 3000;
-  const REPEAT_IDLE   = 20000;
-  const REPEAT_ACTIVE = 40000;
+     Repeat interval:
+       • Cursor IDLE  (no mousemove for 3s) → every 20 seconds
+       • Cursor ACTIVE                       → every 40 seconds
+     ============================================================ */
+  (function eagleFlight() {
+    const navbar    = document.getElementById('navbar');
+    const eagle     = document.getElementById('navFlyingEagle');
+    const burst     = document.getElementById('navBurst');
+    const brandQ    = document.getElementById('brandQ');
+    const navStatus = document.getElementById('navStatus');
+    if (!navbar || !eagle || !burst || !brandQ || !navStatus) return;
 
-  const T_SHAKE_MS    = 600;
-  const T_SWAP_MS     = 400;
-  const T_FLIGHT_OUT  = 6000;   // CSS flyRight duration
-  const T_PILL_MS     = 2600;   // hover + perch + bob
-  const T_CROUCH_MS   = 250;
-  const T_FLIGHT_BACK = 5500;   // CSS flyLeft duration
-  const T_RESET_MS    = 600;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
 
-  /* ---- Cursor activity ---- */
-  let lastMouseMove = Date.now();
-  document.addEventListener('mousemove', () => { lastMouseMove = Date.now(); }, { passive: true });
-  const isCursorIdle = () => (Date.now() - lastMouseMove) >= CURSOR_IDLE_THRESHOLD;
-  const nextInterval = () => isCursorIdle() ? REPEAT_IDLE : REPEAT_ACTIVE;
+    /* ---- Timing (ms) — keep in sync with CSS ---- */
+    const CURSOR_IDLE_THRESHOLD = 3000;
+    const REPEAT_IDLE   = 20000;
+    const REPEAT_ACTIVE = 40000;
 
-  /* ---- State ---- */
-  let idleTimer = null;
-  let running = false;
+    const T_SHAKE_MS    = 600;
+    const T_SWAP_MS     = 400;
+    const T_FLIGHT_OUT  = 6000;   // CSS flyRight duration
+    const T_PILL_MS     = 2600;   // hover + perch + bob
+    const T_CROUCH_MS   = 250;
+    const T_FLIGHT_BACK = 5500;   // CSS flyLeft duration
+    const T_RESET_MS    = 600;
 
-  /* ---- Helpers ---- */
-  const computePositions = () => {
-    const nbRect   = navbar.getBoundingClientRect();
-    const ringRect = brandQ.getBoundingClientRect();
-    const pillRect = navStatus.getBoundingClientRect();
+    /* ---- Cursor activity ---- */
+    let lastMouseMove = Date.now();
+    document.addEventListener('mousemove', () => { lastMouseMove = Date.now(); }, { passive: true });
+    const isCursorIdle = () => (Date.now() - lastMouseMove) >= CURSOR_IDLE_THRESHOLD;
+    const nextInterval = () => isCursorIdle() ? REPEAT_IDLE : REPEAT_ACTIVE;
 
-    const startX = ringRect.left - nbRect.left + ringRect.width / 2;
-    const startY = ringRect.top  - nbRect.top  + ringRect.height / 2;
-    const endX   = pillRect.left - nbRect.left + pillRect.width / 2;
-    const endY   = pillRect.top  - nbRect.top  + pillRect.height / 2;
+    /* ---- State ---- */
+    let idleTimer = null;
+    let running = false;
 
-    return {
-      startX, startY, endX, endY,
-      outDistance:  endX - startX,
-      backDistance: startX - endX
+    /* ---- Helpers ---- */
+    const computePositions = () => {
+      const nbRect   = navbar.getBoundingClientRect();
+      const ringRect = brandQ.getBoundingClientRect();
+      const pillRect = navStatus.getBoundingClientRect();
+
+      const startX = ringRect.left - nbRect.left + ringRect.width / 2;
+      const startY = ringRect.top  - nbRect.top  + ringRect.height / 2;
+      const endX   = pillRect.left - nbRect.left + pillRect.width / 2;
+      const endY   = pillRect.top  - nbRect.top  + pillRect.height / 2;
+
+      return {
+        startX, startY, endX, endY,
+        outDistance:  endX - startX,
+        backDistance: startX - endX
+      };
     };
-  };
 
-  /* Perched eagle sits ON TOP of the pill, not inside it.
-     Offset = half eagle height (26) + half pill height (~14). */
-  const PERCH_OFFSET = 40;
+    /* Perched eagle sits ON TOP of the pill, not inside it.
+       Offset = half eagle height (26) + half pill height (~14). */
+    const PERCH_OFFSET = 40;
 
-  const spawnSparks = (x, y, count = 7) => {
-    const container = document.createElement('div');
-    container.className = 'nav-sparks';
-    container.style.left = x + 'px';
-    container.style.top  = y + 'px';
-    navbar.appendChild(container);
+    const spawnSparks = (x, y, count = 7) => {
+      const container = document.createElement('div');
+      container.className = 'nav-sparks';
+      container.style.left = x + 'px';
+      container.style.top  = y + 'px';
+      navbar.appendChild(container);
 
-    for (let i = 0; i < count; i++) {
-      const spark = document.createElement('span');
-      spark.className = 'nav-spark';
-      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.6;
-      const dist  = 24 + Math.random() * 22;
-      spark.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
-      spark.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
-      spark.style.setProperty('--sd', (0.55 + Math.random() * 0.35) + 's');
-      container.appendChild(spark);
-    }
-    setTimeout(() => container.remove(), 1300);
-  };
+      for (let i = 0; i < count; i++) {
+        const spark = document.createElement('span');
+        spark.className = 'nav-spark';
+        const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.6;
+        const dist  = 24 + Math.random() * 22;
+        spark.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
+        spark.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
+        spark.style.setProperty('--sd', (0.55 + Math.random() * 0.35) + 's');
+        container.appendChild(spark);
+      }
+      setTimeout(() => container.remove(), 1300);
+    };
 
-  const swapStatusText = (text) => {
-    const el = navStatus.querySelector('.status-text');
-    if (!el) return;
-    el.style.transition = 'opacity 0.2s ease';
-    el.style.opacity = '0';
-    setTimeout(() => {
-      el.textContent = text;
-      el.style.opacity = '1';
-    }, 200);
-  };
-
-  /* ---- Arm the next flight ---- */
-  const armIdle = () => {
-    if (running) return;
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(runSequence, nextInterval());
-  };
-
-  /* ---- The full sequence ---- */
-  const runSequence = () => {
-    if (running) return;
-    if (window.innerWidth <= 1024) { armIdle(); return; }
-    running = true;
-
-    const pos = computePositions();
-
-    /* Initial placement */
-    eagle.style.left = pos.startX + 'px';
-    eagle.style.top  = pos.startY + 'px';
-    eagle.style.setProperty('--fly-distance', pos.outDistance + 'px');
-    eagle.src = 'images/logo/eagle-right.png';
-
-    burst.style.left = pos.startX + 'px';
-    burst.style.top  = pos.startY + 'px';
-
-    /* ---------- Phase 1: trigger — bubbles + ring shake ---------- */
-    burst.classList.add('active');
-    brandQ.classList.add('nav-ring-shake');
-
-    setTimeout(() => brandQ.classList.remove('nav-ring-shake'), T_SHAKE_MS);
-
-    /* ---------- Phase 2: combined logo fades out ---------- */
-    setTimeout(() => { brandQ.style.opacity = '0'; }, T_SHAKE_MS + 100);
-
-    /* ---------- Phase 3: empty ring, launch ---------- */
-    setTimeout(() => {
-      brandQ.src = 'images/logo/q-ring.png';
-      brandQ.style.opacity = '1';
-      eagle.classList.add('flying');
-    }, T_SHAKE_MS + 100 + T_SWAP_MS);
-
-    /* ---------- Phase 4: bubble cleanup ---------- */
-    setTimeout(() => burst.classList.remove('active'), T_SHAKE_MS + 1500);
-
-    /* ---------- Phase 5: arrival — hover → touchdown + impact ---------- */
-    const tTouchdown = T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT;
-
-    setTimeout(() => {
-      /* Stop flight, start landing animation (includes hover) */
-      eagle.classList.remove('flying');
-      eagle.style.left = pos.endX + 'px';
-      eagle.style.top  = (pos.endY - PERCH_OFFSET) + 'px';
-      eagle.classList.add('perched');
-    }, tTouchdown);
-
-    /* Impact effects fire ~350ms after arrival (after hover beat) */
-    const tImpact = tTouchdown + 350;
-
-    setTimeout(() => {
-      /* Status pill reactions */
-      navStatus.classList.add('systems-checking');
-      swapStatusText('Checking…');
-
-      /* Sparks flung outward from the pill */
-      spawnSparks(pos.endX, pos.endY);
-
-      /* Navbar border flashes */
-      navbar.classList.add('impact');
-      setTimeout(() => navbar.classList.remove('impact'), 500);
-    }, tImpact);
-
-    /* ---------- Phase 6: pre-departure crouch ---------- */
-    const tCrouchStart = tTouchdown + T_PILL_MS - T_CROUCH_MS;
-
-    setTimeout(() => {
-      eagle.classList.add('crouching');
-      /* Crouch is applied relative to current perched pose */
-      eagle.style.transform = 'translate(-50%, calc(-50% - 0px)) scale(1.08, 0.86)';
-    }, tCrouchStart);
-
-    /* ---------- Phase 7: depart — turn around, glide back ---------- */
-    const tDepart = tTouchdown + T_PILL_MS;
-
-    setTimeout(() => {
-      navStatus.classList.remove('systems-checking');
-      swapStatusText('Systems Online');
-
-      /* Clear crouch inline styles so flyLeft keyframe takes over */
-      eagle.style.transform = '';
-      eagle.style.transition = '';
-      eagle.classList.remove('crouching', 'perched');
-      eagle.src = 'images/logo/eagle-left.png';
-      eagle.style.left = pos.endX + 'px';
-      eagle.style.top  = (pos.endY - PERCH_OFFSET) + 'px';
-      eagle.style.setProperty('--fly-distance', pos.backDistance + 'px');
-      eagle.classList.add('returning');
-    }, tDepart);
-
-    /* ---------- Phase 8: land back in ring, restore combined logo ---------- */
-    const tLandBack = tDepart + T_FLIGHT_BACK;
-
-    setTimeout(() => {
-      eagle.classList.remove('returning');
-      eagle.classList.add('hidden');
-
-      brandQ.style.opacity = '0';
+    const swapStatusText = (text) => {
+      const el = navStatus.querySelector('.status-text');
+      if (!el) return;
+      el.style.transition = 'opacity 0.2s ease';
+      el.style.opacity = '0';
       setTimeout(() => {
-        brandQ.src = 'images/logo/qoech-logo.png';
+        el.textContent = text;
+        el.style.opacity = '1';
+      }, 200);
+    };
+
+    /* ---- Arm the next flight ---- */
+    const armIdle = () => {
+      if (running) return;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(runSequence, nextInterval());
+    };
+
+    /* ---- The full sequence ---- */
+    const runSequence = () => {
+      if (running) return;
+      if (window.innerWidth <= 1024) { armIdle(); return; }
+      running = true;
+
+      const pos = computePositions();
+
+      /* Initial placement */
+      eagle.style.left = pos.startX + 'px';
+      eagle.style.top  = pos.startY + 'px';
+      eagle.style.setProperty('--fly-distance', pos.outDistance + 'px');
+      eagle.src = 'images/logo/eagle-right.png';
+
+      burst.style.left = pos.startX + 'px';
+      burst.style.top  = pos.startY + 'px';
+
+      /* ---------- Phase 1: trigger — bubbles + ring shake ---------- */
+      burst.classList.add('active');
+      brandQ.classList.add('nav-ring-shake');
+
+      setTimeout(() => brandQ.classList.remove('nav-ring-shake'), T_SHAKE_MS);
+
+      /* ---------- Phase 2: combined logo fades out ---------- */
+      setTimeout(() => { brandQ.style.opacity = '0'; }, T_SHAKE_MS + 100);
+
+      /* ---------- Phase 3: empty ring, launch ---------- */
+      setTimeout(() => {
+        brandQ.src = 'images/logo/q-ring.png';
         brandQ.style.opacity = '1';
-      }, 250);
-    }, tLandBack);
+        eagle.classList.add('flying');
+      }, T_SHAKE_MS + 100 + T_SWAP_MS);
 
-    /* ---------- Phase 9: full reset + rearm ---------- */
-    setTimeout(() => {
-      eagle.classList.remove('hidden', 'perched', 'flying', 'returning', 'crouching');
-      eagle.style.left = '';
-      eagle.style.top  = '';
-      eagle.style.transform = '';
-      eagle.style.transition = '';
-      eagle.style.removeProperty('--fly-distance');
-      running = false;
-      armIdle();
-    }, tLandBack + T_RESET_MS);
-  };
+      /* ---------- Phase 4: bubble cleanup ---------- */
+      setTimeout(() => burst.classList.remove('active'), T_SHAKE_MS + 1500);
 
-  /* Kick off first cycle */
-  armIdle();
+      /* ---------- Phase 5: arrival — hover → touchdown + impact ---------- */
+      const tTouchdown = T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT;
+
+      setTimeout(() => {
+        /* Stop flight, start landing animation (includes hover) */
+        eagle.classList.remove('flying');
+        eagle.style.left = pos.endX + 'px';
+        eagle.style.top  = (pos.endY - PERCH_OFFSET) + 'px';
+        eagle.classList.add('perched');
+      }, tTouchdown);
+
+      /* Impact effects fire ~350ms after arrival (after hover beat) */
+      const tImpact = tTouchdown + 350;
+
+      setTimeout(() => {
+        /* Status pill reactions */
+        navStatus.classList.add('systems-checking');
+        swapStatusText('Checking…');
+
+        /* Sparks flung outward from the pill */
+        spawnSparks(pos.endX, pos.endY);
+
+        /* Navbar border flashes */
+        navbar.classList.add('impact');
+        setTimeout(() => navbar.classList.remove('impact'), 500);
+      }, tImpact);
+
+      /* ---------- Phase 6: pre-departure crouch ---------- */
+      const tCrouchStart = tTouchdown + T_PILL_MS - T_CROUCH_MS;
+
+      setTimeout(() => {
+        eagle.classList.add('crouching');
+        /* Crouch is applied relative to current perched pose */
+        eagle.style.transform = 'translate(-50%, calc(-50% - 0px)) scale(1.08, 0.86)';
+      }, tCrouchStart);
+
+      /* ---------- Phase 7: depart — turn around, glide back ---------- */
+      const tDepart = tTouchdown + T_PILL_MS;
+
+      setTimeout(() => {
+        navStatus.classList.remove('systems-checking');
+        swapStatusText('Systems Online');
+
+        /* Clear crouch inline styles so flyLeft keyframe takes over */
+        eagle.style.transform = '';
+        eagle.style.transition = '';
+        eagle.classList.remove('crouching', 'perched');
+        eagle.src = 'images/logo/eagle-left.png';
+        eagle.style.left = pos.endX + 'px';
+        eagle.style.top  = (pos.endY - PERCH_OFFSET) + 'px';
+        eagle.style.setProperty('--fly-distance', pos.backDistance + 'px');
+        eagle.classList.add('returning');
+      }, tDepart);
+
+      /* ---------- Phase 8: land back in ring, restore combined logo ---------- */
+      const tLandBack = tDepart + T_FLIGHT_BACK;
+
+      setTimeout(() => {
+        eagle.classList.remove('returning');
+        eagle.classList.add('hidden');
+
+        brandQ.style.opacity = '0';
+        setTimeout(() => {
+          brandQ.src = 'images/logo/qoech-logo.png';
+          brandQ.style.opacity = '1';
+        }, 250);
+      }, tLandBack);
+
+      /* ---------- Phase 9: full reset + rearm ---------- */
+      setTimeout(() => {
+        eagle.classList.remove('hidden', 'perched', 'flying', 'returning', 'crouching');
+        eagle.style.left = '';
+        eagle.style.top  = '';
+        eagle.style.transform = '';
+        eagle.style.transition = '';
+        eagle.style.removeProperty('--fly-distance');
+        running = false;
+        armIdle();
+      }, tLandBack + T_RESET_MS);
+    };
+
+    /* Kick off first cycle */
+    armIdle();
+  })();
+
 })();
