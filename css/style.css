@@ -4171,13 +4171,13 @@ body.menu-open .navbar {
   .btn-shine:hover .fa-rocket { animation: none; }
 }
 /* ============================================================
-   32. EAGLE FLIGHT ANIMATION
+   32. EAGLE FLIGHT ANIMATION — full choreography
    ============================================================ */
 
 .brand { position: relative; z-index: 6; }
 .nav-menu { position: relative; z-index: 6; }
 
-/* ---- Ring shake (trigger) ---- */
+/* ---------- Ring shake (trigger) ---------- */
 .brand-q.nav-ring-shake {
   animation: ringShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
@@ -4192,7 +4192,7 @@ body.menu-open .navbar {
   90%      { transform: scale(1.70) translateX(-1px) rotate(-1deg); }
 }
 
-/* ---- Flying eagle ---- */
+/* ---------- Flying eagle ---------- */
 .nav-flying-eagle {
   position: absolute;
   left: 0;
@@ -4212,11 +4212,16 @@ body.menu-open .navbar {
 .nav-flying-eagle.returning {
   animation: flyLeft 5.5s cubic-bezier(0.42, 0, 0.58, 1) forwards;
 }
-.nav-flying-eagle.perched { opacity: 1; }
-.nav-flying-eagle.hidden  { opacity: 0; }
+.nav-flying-eagle.perched {
+  opacity: 1;
+  animation: perchedLand 2600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.nav-flying-eagle.hidden { opacity: 0; }
+.nav-flying-eagle.crouching {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-/* Slow, gliding arc — like an eagle riding thermals.
-   Gentle Y drift + softer rotation = smoother, more natural. */
+/* Slow, gliding arc — natural eagle flight */
 @keyframes flyRight {
   0%   { opacity: 0; transform: translate(-50%, -50%) translateX(0) translateY(0) rotate(0) scale(0.65); }
   10%  { opacity: 1; }
@@ -4240,12 +4245,155 @@ body.menu-open .navbar {
   100% { transform: translate(-50%, -50%) translateX(var(--fly-distance)) translateY(0) rotate(0) scale(0.6); opacity: 0; }
 }
 
-/* ---- Brand Q opacity transition for swaps ---- */
-#brandQ {
-  transition: opacity 0.4s ease;
+/* Landing choreography: hover → drop → squash → settle → gentle bob */
+@keyframes perchedLand {
+  0%   { transform: translate(-50%, calc(-50% - 26px)) scale(0.90); }   /* hover */
+  13%  { transform: translate(-50%, calc(-50% - 24px)) scale(0.94); }   /* hover beat */
+  20%  { transform: translate(-50%, calc(-50% - 6px))  scale(1.10); }   /* fast drop */
+  26%  { transform: translate(-50%, calc(-50% - 4px))  scale(1.05, 0.88); } /* squash on impact */
+  36%  { transform: translate(-50%, calc(-50% - 2px))  scale(1.02, 0.96); } /* recover */
+  48%  { transform: translate(-50%, calc(-50% - 0px))  scale(1); }      /* settle */
+  64%  { transform: translate(-50%, calc(-50% - 3px))  scale(1); }      /* bob up */
+  78%  { transform: translate(-50%, calc(-50% - 0px))  scale(1); }      /* bob down */
+  90%  { transform: translate(-50%, calc(-50% - 2px))  scale(1); }      /* settle */
+  100% { transform: translate(-50%, calc(-50% - 0px))  scale(1); }      /* stable */
 }
 
-/* ---- Bubbles rising from the ring ---- */
+/* ---------- Brand Q opacity transition for swaps ---------- */
+#brandQ { transition: opacity 0.4s ease; }
+
+/* ============================================================
+   PILL IMPACT EFFECTS
+   ============================================================ */
+.nav-status { position: relative; }
+
+/* Shockwave ring expanding outward */
+.nav-status::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 2px solid rgba(34, 197, 94, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.nav-status.systems-checking::before {
+  animation: landingRing 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes landingRing {
+  0%   { opacity: 0.9; transform: scale(1);   border-width: 2px; }
+  100% { opacity: 0;   transform: scale(1.9); border-width: 1px; }
+}
+
+/* Soft green flash behind pill */
+.nav-status::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  background: radial-gradient(circle at center,
+    rgba(34, 197, 94, 0.35) 0%,
+    rgba(34, 197, 94, 0.10) 45%,
+    transparent 75%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+.nav-status.systems-checking::after {
+  animation: landingFlash 0.9s ease-out forwards;
+}
+@keyframes landingFlash {
+  0%   { opacity: 0; transform: scale(0.8); }
+  20%  { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 0; transform: scale(1.35); }
+}
+
+/* Status dot ignition burst */
+.nav-status.systems-checking .status-dot {
+  animation: dotIgnite 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes dotIgnite {
+  0%   { transform: scale(1);   box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.9); }
+  18%  { transform: scale(1.8); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0.45); }
+  45%  { transform: scale(1.1); box-shadow: 0 0 0 14px rgba(34, 197, 94, 0); }
+  100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* Text flash on "Systems Online" */
+.nav-status.systems-checking .status-text {
+  animation: textFlash 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes textFlash {
+  0%   { color: var(--text-muted); }
+  22%  { color: var(--primary-dark); letter-spacing: 0.14em; }
+  100% { color: var(--text-muted); }
+}
+
+/* Pill shake + glow (kept from before) */
+.nav-status.systems-checking {
+  animation: pillShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97),
+             pillPulse 2.5s ease-in-out;
+}
+@keyframes pillShake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  10%      { transform: translateX(-3px) rotate(-1deg); }
+  20%      { transform: translateX(3px) rotate(1deg); }
+  30%      { transform: translateX(-2px) rotate(-0.6deg); }
+  45%      { transform: translateX(2px) rotate(0.6deg); }
+  60%      { transform: translateX(-1px) rotate(-0.3deg); }
+  80%      { transform: translateX(1px) rotate(0.3deg); }
+}
+@keyframes pillPulse {
+  0%, 100% { border-color: var(--border-subtle); box-shadow: var(--shadow-xs); }
+  50%      { border-color: rgba(34, 197, 94, 0.60);
+             box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.16),
+                         0 0 22px rgba(34, 197, 94, 0.40); }
+}
+
+/* ============================================================
+   SPARKS — tiny particles flung outward on impact
+   ============================================================ */
+.nav-sparks {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 7;
+}
+.nav-spark {
+  position: absolute;
+  top: 0; left: 0;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%,
+    #FFFFFF 0%, #22C55E 55%, rgba(34, 197, 94, 0) 100%);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.9);
+  transform: translate(-50%, -50%) scale(0);
+  animation: sparkFly var(--sd, 0.7s) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes sparkFly {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+  15%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(0.3); }
+}
+
+/* ============================================================
+   NAVBAR IMPACT FLASH
+   ============================================================ */
+.navbar.impact {
+  animation: navbarImpact 0.5s ease-out;
+}
+@keyframes navbarImpact {
+  0%   { box-shadow: 0 4px 20px -8px rgba(15, 23, 42, 0.08); }
+  20%  { box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.22),
+                     0 4px 20px -8px rgba(15, 23, 42, 0.08); }
+  100% { box-shadow: 0 4px 20px -8px rgba(15, 23, 42, 0.08); }
+}
+
+/* ============================================================
+   BUBBLES (unchanged)
+   ============================================================ */
 .nav-burst {
   position: absolute;
   width: 0;
@@ -4258,8 +4406,7 @@ body.menu-open .navbar {
 
 .nav-bubble {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   border-radius: 50%;
   background: radial-gradient(circle at 32% 30%,
     rgba(255, 255, 255, 0.95) 0%,
@@ -4289,36 +4436,15 @@ body.menu-open .navbar {
 .nav-bubble:nth-child(7) { width: 13px; height: 13px; --bx:   6px; animation-delay: 0.11s; }
 .nav-bubble:nth-child(8) { width:  9px; height:  9px; --bx:  20px; animation-delay: 0.19s; }
 
-/* ---- Pill shake + glow on landing ---- */
-.nav-status.systems-checking {
-  animation: pillShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97),
-             pillPulse 2.5s ease-in-out;
-}
-@keyframes pillShake {
-  0%, 100% { transform: translateX(0) rotate(0); }
-  10%      { transform: translateX(-3px) rotate(-1deg); }
-  20%      { transform: translateX(3px) rotate(1deg); }
-  30%      { transform: translateX(-2px) rotate(-0.6deg); }
-  45%      { transform: translateX(2px) rotate(0.6deg); }
-  60%      { transform: translateX(-1px) rotate(-0.3deg); }
-  80%      { transform: translateX(1px) rotate(0.3deg); }
-}
-@keyframes pillPulse {
-  0%, 100% { border-color: var(--border-subtle); box-shadow: var(--shadow-xs); }
-  50%      { border-color: rgba(34, 197, 94, 0.60);
-             box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.16),
-                         0 0 22px rgba(34, 197, 94, 0.40); }
-}
-.nav-status.systems-checking .status-dot {
-  animation-duration: 0.55s;
-}
-
-/* ---- Guards ---- */
+/* ---------- Guards ---------- */
 @media (prefers-reduced-motion: reduce) {
   .nav-flying-eagle,
-  .nav-burst { display: none !important; }
+  .nav-burst,
+  .nav-sparks { display: none !important; }
+  .navbar.impact { animation: none; }
 }
 @media (max-width: 1024px) {
   .nav-flying-eagle,
-  .nav-burst { display: none !important; }
+  .nav-burst,
+  .nav-sparks { display: none !important; }
 }
