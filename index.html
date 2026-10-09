@@ -47,7 +47,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js" defer></script>
 
-  <link rel="stylesheet" href="css/style.css?v=20" />
+  <link rel="stylesheet" href="css/style.css?v=21" />
 </head>
 
 <body>
@@ -57,7 +57,7 @@
   <!-- ===================== PRELOADER ===================== -->
   <div class="preloader" id="preloader">
     <div class="preloader-inner">
-            <div class="preloader-ring-wrap">
+      <div class="preloader-ring-wrap">
         <div class="preloader-ring"></div>
         <span class="preloader-q-wrap">
           <img class="preloader-q" src="images/logo/qoech-logo.png" alt="Qoech" />
@@ -77,7 +77,7 @@
   <div id="particles-bg" aria-hidden="true"></div>
 
   <!-- ===================== NAVBAR (floating pill) ===================== -->
-      <header class="navbar" id="navbar">
+  <header class="navbar" id="navbar">
     <!-- Flying eagle — starts hidden, animated by JS -->
     <img class="nav-flying-eagle" id="navFlyingEagle" src="images/logo/eagle-right.png" alt="" aria-hidden="true" />
 
@@ -103,31 +103,28 @@
       <span class="brand-sub">TECHNOLOGIES</span>
     </a>
 
-    <nav class="nav-menu" id="navMenu" aria-label="Primary">
-      <button class="nav-close" id="navClose" aria-label="Close menu">
-        <i class="fas fa-times"></i>
-      </button>
+    <!-- Desktop-only links (hidden ≤ 1024px) -->
+    <ul class="nav-links nav-links-desktop">
+      <li><a href="#home" class="nav-link active"><i class="fas fa-circle"></i><span>Home</span></a></li>
+      <li><a href="#about" class="nav-link"><i class="fas fa-circle"></i><span>About</span></a></li>
+      <li><a href="#services" class="nav-link"><i class="fas fa-circle"></i><span>Services</span></a></li>
+      <li><a href="#solutions" class="nav-link"><i class="fas fa-circle"></i><span>Solutions</span></a></li>
+      <li><a href="#projects" class="nav-link"><i class="fas fa-circle"></i><span>Projects</span></a></li>
+      <li><a href="#technologies" class="nav-link"><i class="fas fa-circle"></i><span>Technologies</span></a></li>
+      <li><a href="#contact" class="nav-link"><i class="fas fa-circle"></i><span>Contact</span></a></li>
+    </ul>
 
-      <ul class="nav-links">
-        <li><a href="#home" class="nav-link active"><i class="fas fa-circle"></i><span>Home</span></a></li>
-        <li><a href="#about" class="nav-link"><i class="fas fa-circle"></i><span>About</span></a></li>
-        <li><a href="#services" class="nav-link"><i class="fas fa-circle"></i><span>Services</span></a></li>
-        <li><a href="#solutions" class="nav-link"><i class="fas fa-circle"></i><span>Solutions</span></a></li>
-        <li><a href="#projects" class="nav-link"><i class="fas fa-circle"></i><span>Projects</span></a></li>
-        <li><a href="#technologies" class="nav-link"><i class="fas fa-circle"></i><span>Technologies</span></a></li>
-        <li><a href="#contact" class="nav-link"><i class="fas fa-circle"></i><span>Contact</span></a></li>
-      </ul>
+    <!-- Desktop-only status pill (target of the eagle flight animation) -->
+    <div class="nav-status" id="navStatus" aria-hidden="true">
+      <span class="status-dot"></span>
+      <span class="status-text">Systems Online</span>
+    </div>
 
-      <div class="nav-status" id="navStatus" aria-hidden="true">
-        <span class="status-dot"></span>
-        <span class="status-text">Systems Online</span>
-      </div>
-
-      <a href="#contact" class="nav-cta">
-        <i class="fas fa-rocket"></i>
-        <span>Start a Project</span>
-      </a>
-    </nav>
+    <!-- Desktop-only CTA -->
+    <a href="#contact" class="nav-cta nav-cta-desktop">
+      <i class="fas fa-rocket"></i>
+      <span>Start a Project</span>
+    </a>
 
     <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navMenu">
       <span class="hamburger-ring"></span>
@@ -136,6 +133,36 @@
       <span class="hamburger-line"></span>
     </button>
   </header>
+
+  <!-- ===================== MOBILE MENU PANEL ===================== -->
+  <!--
+    Sibling of the navbar — NOT a child.
+    This is what lets it anchor to the viewport on mobile, so it
+    slides fully off-screen when closed and shows all items when open.
+  -->
+  <nav class="nav-menu" id="navMenu" aria-label="Primary navigation">
+    <ul class="nav-links">
+      <li><a href="#home" class="nav-link active"><i class="fas fa-circle"></i><span>Home</span></a></li>
+      <li><a href="#about" class="nav-link"><i class="fas fa-circle"></i><span>About</span></a></li>
+      <li><a href="#services" class="nav-link"><i class="fas fa-circle"></i><span>Services</span></a></li>
+      <li><a href="#solutions" class="nav-link"><i class="fas fa-circle"></i><span>Solutions</span></a></li>
+      <li><a href="#projects" class="nav-link"><i class="fas fa-circle"></i><span>Projects</span></a></li>
+      <li><a href="#technologies" class="nav-link"><i class="fas fa-circle"></i><span>Technologies</span></a></li>
+      <li><a href="#contact" class="nav-link"><i class="fas fa-circle"></i><span>Contact</span></a></li>
+    </ul>
+
+    <!-- Mobile-only status pill (desktop nav status lives inside the navbar) -->
+    <div class="nav-status-mobile" aria-hidden="true">
+      <span class="status-dot"></span>
+      <span class="status-text">Systems Online</span>
+    </div>
+
+    <a href="#contact" class="nav-cta">
+      <i class="fas fa-rocket"></i>
+      <span>Start a Project</span>
+    </a>
+  </nav>
+
   <div class="nav-overlay" id="navOverlay" aria-hidden="true"></div>
 
   <!-- ===================== HERO ===================== -->
@@ -212,8 +239,8 @@
           <div class="visual-ring visual-ring-mid"></div>
           <div class="visual-ring visual-ring-inner"></div>
 
-                    <div class="visual-core">
-              <img class="visual-core-mark" src="images/logo/qoech-logo.png" alt="" />
+          <div class="visual-core">
+            <img class="visual-core-mark" src="images/logo/qoech-logo.png" alt="" />
           </div>
 
           <div class="orbit orbit-1">
@@ -1381,7 +1408,7 @@
   </section>
 
   <!-- ===================== FOOTER ===================== -->
-    <footer class="footer">
+  <footer class="footer">
     <div class="footer-bg" aria-hidden="true"></div>
     <div class="footer-bg-overlay" aria-hidden="true"></div>
     <div class="footer-scanline" aria-hidden="true"></div>
@@ -1511,7 +1538,7 @@
     </div>
   </div>
 
-  <script src="js/main.js?v=16" defer></script>
+  <script src="js/main.js?v=17" defer></script>
 
 </body>
 </html>
