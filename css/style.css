@@ -4207,34 +4207,37 @@ body.menu-open .navbar {
   will-change: transform, opacity;
 }
 .nav-flying-eagle.flying {
-  animation: flyRight 3.6s cubic-bezier(0.32, 0.08, 0.24, 1) forwards;
+  animation: flyRight 6s cubic-bezier(0.42, 0, 0.58, 1) forwards;
 }
 .nav-flying-eagle.returning {
-  animation: flyLeft 3.2s cubic-bezier(0.32, 0.08, 0.24, 1) forwards;
+  animation: flyLeft 5.5s cubic-bezier(0.42, 0, 0.58, 1) forwards;
 }
 .nav-flying-eagle.perched { opacity: 1; }
 .nav-flying-eagle.hidden  { opacity: 0; }
 
+/* Slow, gliding arc — like an eagle riding thermals.
+   Gentle Y drift + softer rotation = smoother, more natural. */
 @keyframes flyRight {
-  0%   { opacity: 0; transform: translate(-50%, -50%) translateX(0) translateY(0) rotate(0) scale(0.6); }
-  8%   { opacity: 1; }
-  18%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.18)) translateY(-20px) rotate(-8deg) scale(0.82); }
-  34%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.34)) translateY(18px)  rotate(7deg)  scale(0.92); }
-  50%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.50)) translateY(-20px) rotate(-7deg) scale(1); }
-  66%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.66)) translateY(18px)  rotate(6deg)  scale(1.04); }
-  80%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.80)) translateY(-16px) rotate(-5deg) scale(1.02); }
-  92%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.92)) translateY(8px)   rotate(3deg)  scale(0.88); opacity: 1; }
-  100% { transform: translate(-50%, -50%) translateX(var(--fly-distance)) translateY(0) rotate(0) scale(0.85); opacity: 1; }
+  0%   { opacity: 0; transform: translate(-50%, -50%) translateX(0) translateY(0) rotate(0) scale(0.65); }
+  10%  { opacity: 1; }
+  16%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.16)) translateY(-22px) rotate(-7deg) scale(0.76); }
+  32%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.32)) translateY(16px)  rotate(6deg)  scale(0.84); }
+  48%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.48)) translateY(-20px) rotate(-6deg) scale(0.92); }
+  64%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.64)) translateY(14px)  rotate(5deg)  scale(0.98); }
+  78%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.78)) translateY(-12px) rotate(-4deg) scale(1.02); }
+  90%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.90)) translateY(6px)   rotate(2deg)  scale(0.92); }
+  100% { transform: translate(-50%, -50%) translateX(var(--fly-distance)) translateY(0) rotate(0) scale(0.88); opacity: 1; }
 }
 
 @keyframes flyLeft {
-  0%   { opacity: 1; transform: translate(-50%, -50%) translateX(0) translateY(0) rotate(0) scale(0.85); }
-  15%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.15)) translateY(-18px) rotate(7deg)  scale(0.9); }
-  32%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.32)) translateY(16px)  rotate(-6deg) scale(0.95); }
-  50%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.50)) translateY(-18px) rotate(6deg)  scale(1); }
-  68%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.68)) translateY(16px)  rotate(-5deg) scale(0.95); }
-  84%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.84)) translateY(-14px) rotate(4deg)  scale(0.85); }
-  100% { transform: translate(-50%, -50%) translateX(var(--fly-distance)) translateY(0) rotate(0) scale(0.65); opacity: 0; }
+  0%   { opacity: 1; transform: translate(-50%, -50%) translateX(0) translateY(0) rotate(0) scale(0.88); }
+  14%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.14)) translateY(-20px) rotate(6deg)  scale(0.92); }
+  30%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.30)) translateY(15px)  rotate(-6deg) scale(0.95); }
+  46%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.46)) translateY(-18px) rotate(5deg)  scale(0.98); }
+  62%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.62)) translateY(14px)  rotate(-5deg) scale(0.96); }
+  78%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.78)) translateY(-12px) rotate(3deg)  scale(0.82); }
+  92%  { transform: translate(-50%, -50%) translateX(calc(var(--fly-distance) * 0.92)) translateY(4px)   rotate(-2deg) scale(0.72); opacity: 1; }
+  100% { transform: translate(-50%, -50%) translateX(var(--fly-distance)) translateY(0) rotate(0) scale(0.6); opacity: 0; }
 }
 
 /* ---- Brand Q opacity transition for swaps ---- */
