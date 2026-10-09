@@ -1462,157 +1462,172 @@
     });
   }
     /* ============================================================
-     19. EAGLE FLIGHT ANIMATION
-     Idle → ring shakes + bubbles rise → combined logo fades to
-     empty ring → eagle flies right to Systems Online → pill
-     shakes + glows → eagle flies back left → lands in ring →
-     combined logo restores. Once per session. No mobile.
-     ============================================================ */
-  (function eagleFlight() {
-    const navbar    = document.getElementById('navbar');
-    const eagle     = document.getElementById('navFlyingEagle');
-    const burst     = document.getElementById('navBurst');
-    const brandQ    = document.getElementById('brandQ');
-    const navStatus = document.getElementById('navStatus');
-    if (!navbar || !eagle || !burst || !brandQ || !navStatus) return;
+   19. EAGLE FLIGHT ANIMATION — repeating, cursor-aware
+   ------------------------------------------------------------
+   Every cycle: ring shakes + bubbles rise → combined logo
+   fades to empty ring → eagle glides right to the Systems
+   Online pill → pill shakes + glows → eagle glides back →
+   lands in ring → combined logo returns.
 
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) return;
+   Repeat interval:
+     • Cursor IDLE  (no mousemove for 3s) → every 20 seconds
+     • Cursor ACTIVE (user moving mouse)  → every 40 seconds
 
-    const SESSION_KEY   = 'qoech_eagle_flown_v1';
-    const IDLE_MS       = 20000;
-    const T_SHAKE_MS    = 600;
-    const T_SWAP_MS     = 400;
-    const T_FLIGHT_OUT  = 3600;
-    const T_PILL_MS     = 2500;
-    const T_FLIGHT_BACK = 3200;
-    const T_RESET_MS    = 500;
+   Runs forever. Disabled on mobile and prefers-reduced-motion.
+   ============================================================ */
+(function eagleFlight() {
+  const navbar    = document.getElementById('navbar');
+  const eagle     = document.getElementById('navFlyingEagle');
+  const burst     = document.getElementById('navBurst');
+  const brandQ    = document.getElementById('brandQ');
+  const navStatus = document.getElementById('navStatus');
+  if (!navbar || !eagle || !burst || !brandQ || !navStatus) return;
 
-    let idleTimer = null;
-    let running   = false;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
 
-    try {
-      if (sessionStorage.getItem(SESSION_KEY) === '1') return;
-    } catch (_) {}
+  /* ---- Timing (ms) ---- */
+  const CURSOR_IDLE_THRESHOLD = 3000;   // no mouse move for 3s ⇒ idle
+  const REPEAT_IDLE  = 20000;           // next flight in 20s when idle
+  const REPEAT_ACTIVE = 40000;          // next flight in 40s when active
 
-    const computePositions = () => {
-      const nbRect   = navbar.getBoundingClientRect();
-      const ringRect = brandQ.getBoundingClientRect();
-      const pillRect = navStatus.getBoundingClientRect();
+  const T_SHAKE_MS    = 600;
+  const T_SWAP_MS     = 400;
+  const T_FLIGHT_OUT  = 6000;           // matches CSS flyRight
+  const T_PILL_MS     = 2500;
+  const T_FLIGHT_BACK = 5500;           // matches CSS flyLeft
+  const T_RESET_MS    = 600;
 
-      const startX = ringRect.left - nbRect.left + ringRect.width / 2;
-      const startY = ringRect.top  - nbRect.top  + ringRect.height / 2;
-      const endX   = pillRect.left - nbRect.left + pillRect.width / 2;
-      const endY   = pillRect.top  - nbRect.top  + pillRect.height / 2;
+  /* ---- Cursor activity tracking ---- */
+  let lastMouseMove = Date.now();
 
-      return {
-        startX, startY, endX, endY,
-        outDistance:  endX - startX,
-        backDistance: startX - endX
-      };
+  document.addEventListener('mousemove', () => {
+    lastMouseMove = Date.now();
+  }, { passive: true });
+
+  const isCursorIdle = () =>
+    (Date.now() - lastMouseMove) >= CURSOR_IDLE_THRESHOLD;
+
+  const nextInterval = () =>
+    isCursorIdle() ? REPEAT_IDLE : REPEAT_ACTIVE;
+
+  /* ---- State ---- */
+  let idleTimer = null;
+  let running   = false;
+
+  const computePositions = () => {
+    const nbRect   = navbar.getBoundingClientRect();
+    const ringRect = brandQ.getBoundingClientRect();
+    const pillRect = navStatus.getBoundingClientRect();
+
+    const startX = ringRect.left - nbRect.left + ringRect.width / 2;
+    const startY = ringRect.top  - nbRect.top  + ringRect.height / 2;
+    const endX   = pillRect.left - nbRect.left + pillRect.width / 2;
+    const endY   = pillRect.top  - nbRect.top  + pillRect.height / 2;
+
+    return {
+      startX, startY, endX, endY,
+      outDistance:  endX - startX,
+      backDistance: startX - endX
     };
+  };
 
-    const runSequence = () => {
-      if (running) return;
-      if (window.innerWidth <= 1024) return;
-      running = true;
+  const armIdle = () => {
+    if (running) return;
+    clearTimeout(idleTimer);
+    const wait = nextInterval();
+    idleTimer = setTimeout(runSequence, wait);
+  };
 
-      const pos = computePositions();
+  const runSequence = () => {
+    if (running) return;
+    if (window.innerWidth <= 1024) {
+      armIdle();          // re-arm on desktop-only guard fail
+      return;
+    }
+    running = true;
 
-      eagle.style.left = pos.startX + 'px';
-      eagle.style.top  = pos.startY + 'px';
-      eagle.style.setProperty('--fly-distance', pos.outDistance + 'px');
-      eagle.src = 'images/logo/eagle-right.png';
+    const pos = computePositions();
 
-      burst.style.left = pos.startX + 'px';
-      burst.style.top  = pos.startY + 'px';
+    eagle.style.left = pos.startX + 'px';
+    eagle.style.top  = pos.startY + 'px';
+    eagle.style.setProperty('--fly-distance', pos.outDistance + 'px');
+    eagle.src = 'images/logo/eagle-right.png';
 
-      // Phase 1 — bubbles + ring shake
-      burst.classList.add('active');
-      brandQ.classList.add('nav-ring-shake');
+    burst.style.left = pos.startX + 'px';
+    burst.style.top  = pos.startY + 'px';
 
-      // Phase 2 — shake ends
+    /* Phase 1 — bubbles + ring shake */
+    burst.classList.add('active');
+    brandQ.classList.add('nav-ring-shake');
+
+    /* Phase 2 — shake ends */
+    setTimeout(() => {
+      brandQ.classList.remove('nav-ring-shake');
+    }, T_SHAKE_MS);
+
+    /* Phase 3 — combined logo fades out */
+    setTimeout(() => {
+      brandQ.style.opacity = '0';
+    }, T_SHAKE_MS + 100);
+
+    /* Phase 4 — empty ring, eagle launches right */
+    setTimeout(() => {
+      brandQ.src = 'images/logo/q-ring.png';
+      brandQ.style.opacity = '1';
+      eagle.classList.add('flying');
+    }, T_SHAKE_MS + 100 + T_SWAP_MS);
+
+    /* Phase 5 — bubble cleanup */
+    setTimeout(() => {
+      burst.classList.remove('active');
+    }, T_SHAKE_MS + 1500);
+
+    /* Phase 6 — eagle reaches pill, pill shakes + glows */
+    setTimeout(() => {
+      eagle.classList.remove('flying');
+      eagle.style.left = pos.endX + 'px';
+      eagle.style.top  = pos.endY + 'px';
+      eagle.classList.add('perched');
+      navStatus.classList.add('systems-checking');
+    }, T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT);
+
+    /* Phase 7 — turn around, glide back */
+    setTimeout(() => {
+      navStatus.classList.remove('systems-checking');
+
+      eagle.classList.remove('perched');
+      eagle.src = 'images/logo/eagle-left.png';
+      eagle.style.left = pos.endX + 'px';
+      eagle.style.top  = pos.endY + 'px';
+      eagle.style.setProperty('--fly-distance', pos.backDistance + 'px');
+      eagle.classList.add('returning');
+    }, T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT + T_PILL_MS);
+
+    /* Phase 8 — land in ring, restore combined logo */
+    setTimeout(() => {
+      eagle.classList.remove('returning');
+      eagle.classList.add('hidden');
+
+      brandQ.style.opacity = '0';
       setTimeout(() => {
-        brandQ.classList.remove('nav-ring-shake');
-      }, T_SHAKE_MS);
-
-      // Phase 3 — combined logo fades out
-      setTimeout(() => {
-        brandQ.style.opacity = '0';
-      }, T_SHAKE_MS + 100);
-
-      // Phase 4 — empty ring, eagle starts flying right
-      setTimeout(() => {
-        brandQ.src = 'images/logo/q-ring.png';
+        brandQ.src = 'images/logo/qoech-logo.png';
         brandQ.style.opacity = '1';
-        eagle.classList.add('flying');
-      }, T_SHAKE_MS + 100 + T_SWAP_MS);
+      }, 250);
+    }, T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT + T_PILL_MS + T_FLIGHT_BACK);
 
-      // Phase 5 — bubbles cleanup
-      setTimeout(() => {
-        burst.classList.remove('active');
-      }, T_SHAKE_MS + 1500);
+    /* Phase 9 — full reset, then re-arm the next cycle */
+    setTimeout(() => {
+      eagle.classList.remove('hidden', 'perched', 'flying', 'returning');
+      eagle.style.left = '';
+      eagle.style.top  = '';
+      eagle.style.removeProperty('--fly-distance');
+      running = false;
+      armIdle();          // ← schedule the next flight
+    }, T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT + T_PILL_MS + T_FLIGHT_BACK + T_RESET_MS);
+  };
 
-      // Phase 6 — eagle reaches pill, pill shakes + glows
-      setTimeout(() => {
-        eagle.classList.remove('flying');
-        eagle.style.left = pos.endX + 'px';
-        eagle.style.top  = pos.endY + 'px';
-        eagle.classList.add('perched');
-        navStatus.classList.add('systems-checking');
-      }, T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT);
-
-      // Phase 7 — eagle turns around and flies back
-      setTimeout(() => {
-        navStatus.classList.remove('systems-checking');
-
-        eagle.classList.remove('perched');
-        eagle.src = 'images/logo/eagle-left.png';
-        eagle.style.left = pos.endX + 'px';
-        eagle.style.top  = pos.endY + 'px';
-        eagle.style.setProperty('--fly-distance', pos.backDistance + 'px');
-        eagle.classList.add('returning');
-      }, T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT + T_PILL_MS);
-
-      // Phase 8 — eagle lands in the ring, restore combined logo
-      setTimeout(() => {
-        eagle.classList.remove('returning');
-        eagle.classList.add('hidden');
-
-        brandQ.style.opacity = '0';
-        setTimeout(() => {
-          brandQ.src = 'images/logo/qoech-logo.png';
-          brandQ.style.opacity = '1';
-        }, 250);
-      }, T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT + T_PILL_MS + T_FLIGHT_BACK);
-
-      // Phase 9 — full reset
-      setTimeout(() => {
-        eagle.classList.remove('hidden', 'perched', 'flying', 'returning');
-        eagle.style.left = '';
-        eagle.style.top  = '';
-        eagle.style.removeProperty('--fly-distance');
-        running = false;
-      }, T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT + T_PILL_MS + T_FLIGHT_BACK + T_RESET_MS);
-    };
-
-    const armIdle = () => {
-      if (running) return;
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(() => {
-        if (running) return;
-        try {
-          if (sessionStorage.getItem(SESSION_KEY) === '1') return;
-          sessionStorage.setItem(SESSION_KEY, '1');
-        } catch (_) {}
-        runSequence();
-      }, IDLE_MS);
-    };
-
-    ['mousemove', 'scroll', 'click', 'keydown', 'touchstart'].forEach((evt) => {
-      document.addEventListener(evt, armIdle, { passive: true });
-    });
-
-    armIdle();
-  })();
+  /* Kick off the first cycle. */
+  armIdle();
+})();
 })();
