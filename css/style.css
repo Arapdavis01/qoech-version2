@@ -501,13 +501,21 @@ strong { font-weight: 600; color: var(--text-heading); }
 
 /* ============================================================
    09. NAVBAR — floating pill + letter-Q brand
+   ============================================================
+   Centering uses left/right + margin:auto instead of
+   left:50% + transform:translateX(-50%).
+   Reason: a `transform` on an ancestor creates a containing
+   block for `position: fixed` descendants — which would break
+   the mobile menu panel (it would anchor to the navbar
+   instead of the viewport). margin:auto centering avoids
+   that entirely, with the same visual result.
    ============================================================ */
 .navbar {
   position: fixed;
   top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 4rem);
+  left: 2rem;
+  right: 2rem;
+  margin: 0 auto;
   max-width: 1280px;
   height: var(--nav-height);
   display: flex;
@@ -536,6 +544,7 @@ strong { font-weight: 600; color: var(--text-heading); }
               inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
+/* ---- Brand: the Q logo tucks into "OECH" as one wordmark ---- */
 .brand {
   display: inline-flex;
   flex-direction: column;
@@ -597,6 +606,7 @@ strong { font-weight: 600; color: var(--text-heading); }
   line-height: 1;
 }
 
+/* ---- Nav menu wrapper (desktop layout) ---- */
 .nav-menu {
   display: flex;
   align-items: center;
@@ -608,6 +618,7 @@ strong { font-weight: 600; color: var(--text-heading); }
   gap: 1.75rem;
 }
 
+/* ---- Nav links with icon reveal ---- */
 .nav-link {
   position: relative;
   display: inline-flex;
@@ -657,6 +668,7 @@ strong { font-weight: 600; color: var(--text-heading); }
 .nav-link.active { color: var(--primary-dark); font-weight: 600; }
 .nav-link.active::after { width: 100%; }
 
+/* ---- Systems-online pill ---- */
 .nav-status {
   display: inline-flex;
   align-items: center;
@@ -676,6 +688,7 @@ strong { font-weight: 600; color: var(--text-heading); }
 .nav-status .status-dot { width: 6px; height: 6px; }
 .nav-status .status-text { line-height: 1; }
 
+/* ---- Nav CTA ---- */
 .nav-cta {
   display: inline-flex;
   align-items: center;
@@ -705,7 +718,13 @@ strong { font-weight: 600; color: var(--text-heading); }
 
 /* ============================================================
    10. HAMBURGER + MOBILE MENU
+   ============================================================
+   The hamburger stays visible at all times — including when
+   the menu is open — and morphs into an X. Tapping it again
+   closes the menu. No hunting for a small × in the corner.
    ============================================================ */
+
+/* ---- Base hamburger ---- */
 .hamburger {
   display: none;
   position: relative;
@@ -730,6 +749,7 @@ strong { font-weight: 600; color: var(--text-heading); }
 }
 .hamburger:active { transform: scale(0.94); }
 
+/* Rotating conic ring — only on real pointer devices */
 .hamburger-ring {
   position: absolute;
   inset: -2px;
@@ -763,13 +783,16 @@ strong { font-weight: 600; color: var(--text-heading); }
               background 0.2s ease;
 }
 
-.hamburger:hover { border-color: var(--border-hover); }
-.hamburger:hover .hamburger-ring { opacity: 1; }
-.hamburger:hover .hamburger-line { background: var(--primary); }
+/* Hover styles only on real pointers — prevents the ring from
+   getting stuck "on" after a tap on touch devices */
+@media (hover: hover) {
+  .hamburger:hover { border-color: var(--border-hover); }
+  .hamburger:hover .hamburger-ring { opacity: 1; }
+  .hamburger:hover .hamburger-line { background: var(--primary); }
+}
 
-/* ---- Open state — morphs into an X and stays visible ---- */
+/* ---- Open state — X only, no glowing ring ---- */
 .hamburger.open { border-color: var(--primary); }
-.hamburger.open .hamburger-ring { opacity: 1; }
 .hamburger.open .hamburger-line { background: var(--primary); }
 .hamburger.open .hamburger-line:nth-child(2) {
   transform: translateY(7px) rotate(45deg);
@@ -784,6 +807,7 @@ strong { font-weight: 600; color: var(--text-heading); }
 
 @keyframes hamburgerSpin { 100% { transform: rotate(360deg); } }
 
+/* ---- Dark overlay behind the menu panel ---- */
 .nav-overlay {
   position: fixed;
   inset: 0;
@@ -797,6 +821,9 @@ strong { font-weight: 600; color: var(--text-heading); }
 }
 .nav-overlay.open { opacity: 1; visibility: visible; }
 
+/* When the menu is open, the navbar itself becomes invisible
+   (the panel takes over the right side; the hamburger floats
+   above it via its own higher z-index). */
 body.menu-open .navbar {
   z-index: 1002;
   backdrop-filter: none;
@@ -806,20 +833,25 @@ body.menu-open .navbar {
   box-shadow: none;
 }
 
-/* The in-menu close button is now redundant — hamburger handles closing */
+/* The in-menu close button is no longer used — hamburger closes */
 .nav-close { display: none !important; }
 
+
+/* ---- Mobile & tablet (≤ 1024px) ---- */
 @media (max-width: 1024px) {
+
   .navbar {
-    width: calc(100% - 2rem);
+    left: 1rem;
+    right: 1rem;
     padding: 0 1.25rem;
   }
+
   .nav-link > i { display: none; }
 
-  /* Hamburger visible at all times — including when the menu is open */
+  /* Hamburger visible at all times — closed AND open */
   .hamburger { display: flex; }
-  /* NOTE: removed `.hamburger.open { display: none !important; }` */
 
+  /* ---- Slide-in menu panel ---- */
   .nav-menu {
     position: fixed;
     top: 0;
@@ -827,6 +859,7 @@ body.menu-open .navbar {
     width: 82%;
     max-width: 360px;
     height: 100vh;
+    height: 100dvh;          /* modern browsers — accounts for mobile browser chrome */
     padding: 5.5rem 2rem 3rem;
     background: #FFFFFF;
     border-left: 1px solid var(--border-subtle);
@@ -841,10 +874,13 @@ body.menu-open .navbar {
     z-index: 1000;
     overflow-y: auto;
     overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
   .nav-menu.open { transform: translateX(0); }
+
   .nav-status { display: none; }
 
+  /* ---- Links inside the panel ---- */
   .nav-links {
     flex-direction: column;
     align-items: flex-start;
@@ -888,7 +924,6 @@ body.menu-open .navbar {
     font-size: 0.75rem;
   }
 }
-
 /* ============================================================
    11. HERO — with layered photo background
    ============================================================ */
