@@ -1461,5 +1461,148 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
+  /* ============================================================
+     19. EAGLE FLIGHT ANIMATION
+     Idle-triggered: perched eagle spins, burst fires, flying
+     eagle glides across navbar to Systems Online, holds, returns.
+     Once per session. Disabled on mobile and reduced-motion.
+     ============================================================ */
+  (function eagleFlight() {
+    const navbar    = document.getElementById('navbar');
+    const eagle     = document.getElementById('navFlyingEagle');
+    const burst     = document.getElementById('navBurst');
+    const brandQ    = document.getElementById('brandQ');
+    const navStatus = document.getElementById('navStatus');
+    if (!navbar || !eagle || !burst || !brandQ || !navStatus) return;
 
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+
+    const SESSION_KEY    = 'qoech_eagle_flown_v1';
+    const IDLE_MS        = 20000;
+    const SPIN_MS        = 500;
+    const BURST_HOLD_MS  = 500;
+    const FLIGHT_OUT_MS  = 1800;
+    const HOLD_MS        = 3000;
+    const FLIGHT_BACK_MS = 1500;
+
+    let idleTimer = null;
+    let running   = false;
+
+    // Skip entirely if already flown this session
+    try {
+      if (sessionStorage.getItem(SESSION_KEY) === '1') return;
+    } catch (_) {}
+
+    const computePositions = () => {
+      const nbRect   = navbar.getBoundingClientRect();
+      const ringRect = brandQ.getBoundingClientRect();
+      const pillRect = navStatus.getBoundingClientRect();
+
+      const startX = ringRect.left - nbRect.left + ringRect.width / 2;
+      const startY = ringRect.top  - nbRect.top  + ringRect.height / 2;
+      const endX   = pillRect.left - nbRect.left + pillRect.width / 2;
+      const endY   = pillRect.top  - nbRect.top  + pillRect.height / 2;
+
+      return {
+        startX, startY, endX, endY,
+        outDistance:  endX - startX,
+        backDistance: startX - endX
+      };
+    };
+
+    const runSequence = () => {
+      if (running) return;
+      if (window.innerWidth <= 1024) return;
+      running = true;
+
+      const pos = computePositions();
+
+      // Position flying eagle at the ring's center
+      eagle.style.left = pos.startX + 'px';
+      eagle.style.top  = pos.startY + 'px';
+      eagle.style.setProperty('--fly-distance', pos.outDistance + 'px');
+      eagle.src = 'images/logo/eagle-right.png';
+
+      // Position the burst at the ring's center
+      burst.style.left = pos.startX + 'px';
+      burst.style.top  = pos.startY + 'px';
+
+      // Phase 1 — spin
+      brandQ.classList.add('nav-spinning');
+
+      // Phase 2 — burst + brand hidden + flying eagle appears
+      setTimeout(() => {
+        burst.classList.add('active');
+        brandQ.classList.add('nav-hidden');
+        brandQ.style.opacity = '0';
+        brandQ.src = 'images/logo/q-ring.png';        // ring only while flying
+        eagle.classList.add('flying');
+      }, SPIN_MS);
+
+      // Phase 3 — burst fades
+      setTimeout(() => {
+        burst.classList.remove('active');
+      }, SPIN_MS + BURST_HOLD_MS + 200);
+
+      // Phase 4 — landed on pill
+      setTimeout(() => {
+        eagle.classList.remove('flying');
+        eagle.style.left = pos.endX + 'px';
+        eagle.style.top  = pos.endY + 'px';
+        eagle.classList.add('perched');
+        navStatus.classList.add('systems-checking');
+      }, SPIN_MS + BURST_HOLD_MS + FLIGHT_OUT_MS);
+
+      // Phase 5 — return flight begins
+      setTimeout(() => {
+        navStatus.classList.remove('systems-checking');
+
+        eagle.classList.remove('perched');
+        eagle.src = 'images/logo/eagle-left.png';     // flip to left-facing
+        eagle.style.left = pos.endX + 'px';
+        eagle.style.top  = pos.endY + 'px';
+        eagle.style.setProperty('--fly-distance', pos.backDistance + 'px');
+        eagle.classList.add('returning');
+      }, SPIN_MS + BURST_HOLD_MS + FLIGHT_OUT_MS + HOLD_MS);
+
+      // Phase 6 — back home, reveal perched logo
+      setTimeout(() => {
+        eagle.classList.remove('returning');
+        eagle.classList.add('hidden');
+        brandQ.src = 'images/logo/qoech-q.png';       // full logo back
+        brandQ.style.opacity = '';
+        brandQ.classList.remove('nav-spinning', 'nav-hidden');
+      }, SPIN_MS + BURST_HOLD_MS + FLIGHT_OUT_MS + HOLD_MS + FLIGHT_BACK_MS);
+
+      // Phase 7 — reset
+      setTimeout(() => {
+        eagle.classList.remove('hidden', 'perched');
+        eagle.style.left = '';
+        eagle.style.top  = '';
+        eagle.style.removeProperty('--fly-distance');
+        running = false;
+      }, SPIN_MS + BURST_HOLD_MS + FLIGHT_OUT_MS + HOLD_MS + FLIGHT_BACK_MS + 400);
+    };
+
+    const armIdle = () => {
+      if (running) return;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        if (running) return;
+        try {
+          if (sessionStorage.getItem(SESSION_KEY) === '1') return;
+          sessionStorage.setItem(SESSION_KEY, '1');
+        } catch (_) {}
+        runSequence();
+      }, IDLE_MS);
+    };
+
+    ['mousemove', 'scroll', 'click', 'keydown', 'touchstart'].forEach((evt) => {
+      document.addEventListener(evt, armIdle, { passive: true });
+    });
+
+    // Start the countdown
+    armIdle();
+  })();
 })();
