@@ -22,6 +22,7 @@
    18. Unified Scroll Loop — progress bar, navbar state,
        active link, back-to-top, hero parallax, stats counter
    19. Eagle Flight Animation — full choreography
+   20. Mobile Carousel Pagination — dots + swipe hint
    ============================================================ */
 
 (function () {
@@ -286,7 +287,14 @@
 
   /* ============================================================
      07. FADE-UP SCROLL ANIMATIONS
+     ------------------------------------------------------------
+     On mobile, sections that become horizontal carousels have
+     their children marked visible immediately — otherwise cards
+     that scroll off to the right stay invisible until swiped.
      ============================================================ */
+  const CAROUSEL_PARENTS = '.services-grid, .featured-projects-grid, .process-timeline, .why-grid';
+  const isMobileLoad = window.innerWidth <= 768;
+
   const fadeEls = document.querySelectorAll(
     '.fade-up, .section-head, .section-divider, ' +
     '.service-card, .solution-card, ' +
@@ -311,6 +319,13 @@
 
     fadeEls.forEach((el, i) => {
       el.classList.add('fade-up');
+
+      // Mobile carousel children — reveal instantly, no observer
+      if (isMobileLoad && el.closest(CAROUSEL_PARENTS)) {
+        el.classList.add('visible');
+        return;
+      }
+
       el.style.transitionDelay = Math.min(i * 40, 240) + 'ms';
       fadeObserver.observe(el);
     });
@@ -1262,12 +1277,32 @@
     }, { passive: true });
   }
 
+  /* Thumbnails — swipe-guard prevents accidental opens when the user
+     swipes the mobile carousel and lifts their finger on a card. */
   document.querySelectorAll('.featured-project-thumb').forEach((thumb) => {
     const img = thumb.querySelector('img');
     if (!img) return;
 
     thumb.style.cursor = 'zoom-in';
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let didSwipe = false;
+
+    thumb.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      didSwipe = false;
+    }, { passive: true });
+
+    thumb.addEventListener('touchmove', (e) => {
+      const dx = Math.abs(e.touches[0].clientX - touchStartX);
+      const dy = Math.abs(e.touches[0].clientY - touchStartY);
+      if (dx > 10 || dy > 10) didSwipe = true;
+    }, { passive: true });
+
     thumb.addEventListener('click', (e) => {
+      if (didSwipe) { didSwipe = false; return; }
       if (e.target.closest('.project-status, .featured-flag')) return;
 
       const card    = thumb.closest('.featured-project-card');
@@ -1462,6 +1497,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
+
 
   /* ============================================================
      19. EAGLE FLIGHT ANIMATION — full choreography
@@ -1684,6 +1720,160 @@
 
     /* Kick off the first cycle — fires 10s after this script runs */
     armNext();
+  })();
+
+
+  /* ============================================================
+     20. MOBILE CAROUSEL PAGINATION
+     ------------------------------------------------------------
+     On mobile (≤768px) the Services / Featured Projects / Process
+     and Why Qoech sections become horizontal snap carousels
+     (see CSS §27). This module adds:
+       • A "Swipe" hint that fades on first interaction
+       • Pagination dots that update as the user scrolls
+       • Dot clicks that scroll to the matching card
+     Disabled on desktop, cleaned up on resize back up.
+     ============================================================ */
+  (function mobileCarouselPagination() {
+    const TRACK_SELECTORS = [
+      '.services-grid',
+      '.featured-projects-grid',
+      '.process-timeline',
+      '.why-grid'
+    ];
+    const MQ = window.matchMedia('(max-width: 768px)');
+    const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduce) return;
+
+    const tracks = [];
+    TRACK_SELECTORS.forEach((sel) => {
+      document.querySelectorAll(sel).forEach((el) => tracks.push(el));
+    });
+    if (!tracks.length) return;
+
+    /* Build hint + dots container for one track */
+    const buildUI = (track) => {
+      if (track.dataset.carouselReady === '1') return;
+      track.dataset.carouselReady = '1';
+
+      const meta = document.createElement('div');
+      meta.className = 'mobile-carousel-meta';
+      meta.innerHTML =
+        '<span class="mobile-carousel-hint" aria-hidden="true">' +
+          '<i class="fas fa-hand-pointer"></i><span>Swipe</span>' +
+        '</span>' +
+        '<div class="mobile-carousel-dots" aria-hidden="true"></div>';
+
+      track.parentNode.insertBefore(meta, track.nextSibling);
+
+      const dotsWrap = meta.querySelector('.mobile-carousel-dots');
+      const hint     = meta.querySelector('.mobile-carousel-hint');
+
+      const cards = Array.from(track.children).filter(
+        (c) => c.nodeType === 1
+      );
+
+      if (cards.length < 2) {
+        meta.remove();
+        track.dataset.carouselReady = '';
+        return;
+      }
+
+      /* Create one dot per card */
+      const dots = cards.map((card, i) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'mcd-dot';
+        dot.setAttribute('aria-label', `Go to card ${i + 1}`);
+        dot.addEventListener('click', () => {
+          const targetLeft = card.offsetLeft - track.offsetLeft;
+          track.scrollTo({ left: targetLeft, behavior: 'smooth' });
+        });
+        dotsWrap.appendChild(dot);
+        return dot;
+      });
+
+      /* Update active dot based on which card is centered */
+      let rafLocked = false;
+      const updateActiveDot = () => {
+        const trackLeft = track.scrollLeft;
+        const trackWidth = track.clientWidth;
+        const viewCenter = trackLeft + trackWidth / 2;
+
+        let bestIndex = 0;
+        let bestDist = Infinity;
+
+        cards.forEach((card, i) => {
+          const cardCenter =
+            card.offsetLeft - track.offsetLeft + card.offsetWidth / 2;
+          const dist = Math.abs(cardCenter - viewCenter);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestIndex = i;
+          }
+        });
+
+        dots.forEach((d, i) =>
+          d.classList.toggle('active', i === bestIndex)
+        );
+      };
+
+      const onScroll = () => {
+        if (rafLocked) return;
+        rafLocked = true;
+        requestAnimationFrame(() => {
+          updateActiveDot();
+          rafLocked = false;
+        });
+      };
+
+      track.addEventListener('scroll', onScroll, { passive: true });
+
+      /* Fade the hint on first interaction (scroll or touch) */
+      let hintDismissed = false;
+      const dismissHint = () => {
+        if (hintDismissed) return;
+        hintDismissed = true;
+        hint.classList.add('hidden');
+        setTimeout(() => hint.remove(), 600);
+      };
+      track.addEventListener('scroll', dismissHint, { passive: true, once: true });
+      track.addEventListener('touchstart', dismissHint, { passive: true, once: true });
+      setTimeout(dismissHint, 5000);
+
+      /* Re-measure if layout changes (e.g. orientation flip) */
+      if ('ResizeObserver' in window) {
+        const ro = new ResizeObserver(() => updateActiveDot());
+        ro.observe(track);
+      }
+
+      updateActiveDot();
+    };
+
+    /* Tear down when leaving mobile */
+    const teardownUI = (track) => {
+      const meta = track.parentNode.querySelector(':scope > .mobile-carousel-meta');
+      if (meta) meta.remove();
+      track.dataset.carouselReady = '';
+    };
+
+    /* Sync all tracks based on current breakpoint */
+    const syncAll = () => {
+      const isMobile = MQ.matches;
+      tracks.forEach((track) => {
+        if (isMobile) {
+          buildUI(track);
+        } else {
+          teardownUI(track);
+        }
+      });
+    };
+
+    syncAll();
+
+    /* React to breakpoint changes */
+    if (MQ.addEventListener) MQ.addEventListener('change', syncAll);
+    else if (MQ.addListener) MQ.addListener(syncAll);
   })();
 
 })();
