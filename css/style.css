@@ -3270,10 +3270,15 @@ body.menu-open .navbar::before {
      • JS Section 20 injects `.mobile-carousel-meta` after each
        carousel for the swipe hint + pagination dots.
 
-   Note on the navbar:
-     The navbar is positioned with left/right + margin:auto
-     (Section 09). To resize it at narrower breakpoints, override
-     the left/right inset — never set `width`.
+   Two positioning rules to remember:
+     1. The navbar (Section 09) is centered with left/right +
+        margin:auto. To resize it, override the left/right insets
+        — never set `width`.
+     2. The mobile menu panel (Section 10) is a viewport-fixed
+        sibling of the navbar. It relies on the navbar NOT
+        creating a containing block (no transform, no
+        backdrop-filter on the navbar itself — those live on
+        .navbar::before instead).
    ============================================================ */
 
 
@@ -3563,8 +3568,10 @@ body.menu-open .navbar::before {
 @media (max-width: 640px) {
   :root { --nav-height: 64px; }
 
-  /* Navbar — override insets only. Never set `width` because
-     the navbar is centered via left/right + margin:auto. */
+  /* Navbar — override insets only.
+     Do NOT set `width` — the navbar is centered via
+     left/right + margin:auto (Section 09). Setting width would
+     fight those insets and offset the hamburger. */
   .navbar {
     top: 12px;
     left: 0.75rem;
@@ -3776,7 +3783,6 @@ body.menu-open .navbar::before {
   .footer-scanline { display: none; }
   .mobile-carousel-hint i { animation: none; }
 }
-
 /* ============================================================
    28. CONTACT WIZARD
    ============================================================ */
