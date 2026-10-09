@@ -4170,3 +4170,166 @@ body.menu-open .navbar {
   .btn-shine::before { display: none; }
   .btn-shine:hover .fa-rocket { animation: none; }
 }
+/* ============================================================
+   32. EAGLE FLIGHT ANIMATION
+   ============================================================ */
+
+/* Make sure nav content sits above the eagle and burst */
+.brand { position: relative; z-index: 6; }
+.nav-menu { position: relative; z-index: 6; }
+
+/* ---- Flying eagle ---------------------------------------- */
+.nav-flying-eagle {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 44px;
+  height: auto;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+  filter: drop-shadow(0 4px 10px rgba(15, 23, 42, 0.20));
+  will-change: transform, opacity;
+}
+.nav-flying-eagle.flying {
+  animation: flyRight 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.nav-flying-eagle.returning {
+  animation: flyLeft 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.nav-flying-eagle.perched { opacity: 1; }
+.nav-flying-eagle.hidden  { opacity: 0; transition: opacity 0.2s ease; }
+
+@keyframes flyRight {
+  0%   { opacity: 0; transform: translate(-50%, -50%) translate(0, 0) rotate(0) scale(0.7); }
+  10%  { opacity: 1; }
+  25%  { transform: translate(-50%, -50%) translate(calc(var(--fly-distance) * 0.25), -14px) rotate(-6deg) scale(0.85); }
+  45%  { transform: translate(-50%, -50%) translate(calc(var(--fly-distance) * 0.45), 14px)  rotate(6deg)  scale(1); }
+  65%  { transform: translate(-50%, -50%) translate(calc(var(--fly-distance) * 0.65), -14px) rotate(-6deg) scale(1.05); }
+  85%  { transform: translate(-50%, -50%) translate(calc(var(--fly-distance) * 0.85), 10px)  rotate(4deg)  scale(0.95); }
+  100% { transform: translate(-50%, -50%) translate(var(--fly-distance), 0) rotate(0) scale(0.88); opacity: 1; }
+}
+@keyframes flyLeft {
+  0%   { opacity: 1; transform: translate(-50%, -50%) translate(0, 0) rotate(0) scale(0.88); }
+  25%  { transform: translate(-50%, -50%) translate(calc(var(--fly-distance) * 0.25), -14px) rotate(6deg) scale(0.9); }
+  45%  { transform: translate(-50%, -50%) translate(calc(var(--fly-distance) * 0.45), 14px)  rotate(-6deg) scale(0.95); }
+  65%  { transform: translate(-50%, -50%) translate(calc(var(--fly-distance) * 0.65), -14px) rotate(6deg)  scale(1); }
+  85%  { transform: translate(-50%, -50%) translate(calc(var(--fly-distance) * 0.85), 10px)  rotate(-4deg) scale(0.95); }
+  100% { transform: translate(-50%, -50%) translate(var(--fly-distance), 0) rotate(0) scale(0.8); opacity: 1; }
+}
+
+/* ---- Spin on perched eagle -------------------------------- */
+.brand-q.nav-spinning {
+  animation: brandQSpin 0.5s cubic-bezier(0.5, 0, 0.5, 1);
+}
+@keyframes brandQSpin {
+  0%   { transform: scale(1.7) rotate(0deg); }
+  50%  { transform: scale(1.85) rotate(180deg); }
+  100% { transform: scale(1.7) rotate(360deg); }
+}
+
+/* ---- Burst effect ---------------------------------------- */
+.nav-burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0;
+}
+.nav-burst.active { opacity: 1; }
+
+.nav-burst-ring {
+  position: absolute;
+  top: 0; left: 0;
+  width: 28px; height: 28px;
+  margin: -14px 0 0 -14px;
+  border: 1.5px solid rgba(34, 197, 94, 0.6);
+  border-radius: 50%;
+  animation: burstRing 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+.nav-burst-ring:nth-child(2) { animation-delay: 0.08s; }
+.nav-burst-ring:nth-child(3) { animation-delay: 0.16s; }
+
+@keyframes burstRing {
+  0%   { transform: scale(0.4); opacity: 0.9; }
+  100% { transform: scale(4.2); opacity: 0; }
+}
+
+.nav-burst-mist {
+  position: absolute;
+  top: -30px; left: -30px;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(34, 197, 94, 0.35) 40%,
+    transparent 72%);
+  animation: burstMist 0.6s ease-out forwards;
+  opacity: 0;
+}
+@keyframes burstMist {
+  0%   { transform: scale(0.3); opacity: 0; }
+  30%  { transform: scale(1);   opacity: 0.95; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.nav-burst-dot {
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  border-radius: 50%;
+  background: #22C55E;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.8);
+  opacity: 0;
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: forwards;
+}
+.nav-burst.active .nav-burst-dot { opacity: 1; }
+
+.nav-burst-dot:nth-child(5)  { animation-name: burstDotN; }
+.nav-burst-dot:nth-child(6)  { animation-name: burstDotNE; }
+.nav-burst-dot:nth-child(7)  { animation-name: burstDotE; }
+.nav-burst-dot:nth-child(8)  { animation-name: burstDotSE; }
+.nav-burst-dot:nth-child(9)  { animation-name: burstDotS; }
+.nav-burst-dot:nth-child(10) { animation-name: burstDotSW; }
+.nav-burst-dot:nth-child(11) { animation-name: burstDotW; }
+.nav-burst-dot:nth-child(12) { animation-name: burstDotNW; }
+
+@keyframes burstDotN  { to { transform: translate(0, -30px);     opacity: 0; } }
+@keyframes burstDotNE { to { transform: translate(21px, -21px);  opacity: 0; } }
+@keyframes burstDotE  { to { transform: translate(30px, 0);      opacity: 0; } }
+@keyframes burstDotSE { to { transform: translate(21px, 21px);   opacity: 0; } }
+@keyframes burstDotS  { to { transform: translate(0, 30px);      opacity: 0; } }
+@keyframes burstDotSW { to { transform: translate(-21px, 21px);  opacity: 0; } }
+@keyframes burstDotW  { to { transform: translate(-30px, 0);     opacity: 0; } }
+@keyframes burstDotNW { to { transform: translate(-21px, -21px); opacity: 0; } }
+
+/* ---- Systems Online pill reaction ------------------------ */
+.nav-status.systems-checking {
+  animation: pillPulse 3s ease-in-out;
+}
+@keyframes pillPulse {
+  0%, 100% { border-color: var(--border-subtle); box-shadow: var(--shadow-xs); }
+  50%      { border-color: rgba(34, 197, 94, 0.55);
+             box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14),
+                         0 0 20px rgba(34, 197, 94, 0.35); }
+}
+.nav-status.systems-checking .status-dot {
+  animation-duration: 0.55s;
+}
+
+/* ---- Guards ---------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .nav-flying-eagle,
+  .nav-burst { display: none !important; }
+}
+
+@media (max-width: 1024px) {
+  .nav-flying-eagle,
+  .nav-burst { display: none !important; }
+}
