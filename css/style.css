@@ -3239,6 +3239,11 @@ body.menu-open .navbar {
      • Hover-lift effects are disabled to prevent sticky states.
      • JS Section 20 injects `.mobile-carousel-meta` after each
        carousel for the swipe hint + pagination dots.
+
+   Note on the navbar:
+     The navbar is positioned with left/right + margin:auto
+     (Section 09). To resize it at narrower breakpoints, override
+     the left/right inset — never set `width`.
    ============================================================ */
 
 
@@ -3528,24 +3533,30 @@ body.menu-open .navbar {
 @media (max-width: 640px) {
   :root { --nav-height: 64px; }
 
+  /* Navbar — override insets only. Never set `width` because
+     the navbar is centered via left/right + margin:auto. */
   .navbar {
     top: 12px;
-    width: calc(100% - 1.5rem);
+    left: 0.75rem;
+    right: 0.75rem;
     padding: 0 1rem;
     height: 60px;
   }
   .navbar.scrolled { top: 8px; }
 
+  /* Brand */
   .brand-q-wrap { width: 30px; height: 30px; transform: translateY(-2px); }
   .brand-q { transform: scale(1.7); }
   .brand:hover .brand-q { transform: scale(1.7) rotate(-4deg); }
   .brand-letters { font-size: 1.15rem; letter-spacing: 0.12em; }
   .brand-sub { font-size: 0.5rem; letter-spacing: 0.28em; margin-left: calc(30px + 0.05rem); }
 
+  /* Preloader */
   .preloader-text { font-size: 1.3rem; }
   .preloader-q { transform: scale(1.7); }
   .preloader-readout { font-size: 0.6rem; }
 
+  /* Hero */
   .hero { padding: calc(var(--nav-height) + 4rem) 0 5rem; }
   .hero-content { padding: 1.5rem 1.5rem 1.25rem; }
   .hero-title { font-size: clamp(1.875rem, 8vw, 2.5rem); }
@@ -3568,10 +3579,12 @@ body.menu-open .navbar {
   .hero-ticker { display: none; }
   .scroll-down { bottom: 2rem; }
 
+  /* About / footer marks */
   .about-card { padding: 1.5rem 1.25rem; }
   .about-card-mark { width: 48px; height: 48px; }
   .footer-q { height: 28px; width: 28px; transform: scale(1.5); }
 
+  /* Section head */
   .section-head { margin-bottom: 2.75rem; }
   .section-label { font-size: 0.6rem; padding: 0.35rem 0.85rem; }
 
@@ -3661,16 +3674,20 @@ body.menu-open .navbar {
   .eagle-readout { gap: 0.75rem; padding: 0.75rem 1rem; flex-direction: column; }
   .readout-item { font-size: 0.55rem; }
 
+  /* Testimonials */
   .testimonial-carousel { padding: 2rem 1.5rem; }
   .testimonial-slide p { font-size: 0.9375rem; }
 
+  /* Contact form */
   .form-row { grid-template-columns: 1fr; }
   .contact-form-wrap { padding: 1.75rem 1.4rem; }
 
+  /* Modals */
   .modal-body { padding: 0 1.5rem 1.75rem; }
   .modal-body h3 { font-size: 1.2rem; }
   .modal-body img { max-height: 180px; }
 
+  /* Back to top */
   .back-to-top { bottom: 1.25rem; right: 1.25rem; width: 42px; height: 42px; font-size: 0.85rem; }
 }
 
@@ -3729,7 +3746,6 @@ body.menu-open .navbar {
   .footer-scanline { display: none; }
   .mobile-carousel-hint i { animation: none; }
 }
-
 
 /* ============================================================
    28. CONTACT WIZARD
