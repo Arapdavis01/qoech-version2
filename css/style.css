@@ -502,13 +502,21 @@ strong { font-weight: 600; color: var(--text-heading); }
 /* ============================================================
    09. NAVBAR — floating pill + letter-Q brand
    ============================================================
-   Centering uses left/right + margin:auto instead of
-   left:50% + transform:translateX(-50%).
-   Reason: a `transform` on an ancestor creates a containing
-   block for `position: fixed` descendants — which would break
-   the mobile menu panel (it would anchor to the navbar
-   instead of the viewport). margin:auto centering avoids
-   that entirely, with the same visual result.
+   IMPORTANT: The `.navbar` element must NOT have any of these:
+     • transform (not none)
+     • backdrop-filter / -webkit-backdrop-filter (not none)
+     • filter (not none)
+     • perspective (not none)
+     • contain: paint / layout / strict
+     • will-change: transform / filter / backdrop-filter
+   Any of them creates a containing block for `position: fixed`
+   descendants. That would make the mobile menu panel anchor to
+   the navbar instead of the viewport — breaking its position,
+   size and slide-off animation.
+
+   We deliver the glass effect via `.navbar::before` instead.
+   A pseudo-element is a CHILD, not an ancestor — so it does not
+   affect the positioning of `.nav-menu`.
    ============================================================ */
 .navbar {
   position: fixed;
@@ -522,21 +530,37 @@ strong { font-weight: 600; color: var(--text-heading); }
   align-items: center;
   justify-content: space-between;
   padding: 0 2rem;
+
+  /* Visual styling moved to ::before */
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-pill);
+
+  z-index: 900;
+  transition: top var(--transition);
+}
+
+/* Glass background + border + shadow — safe place for backdrop-filter */
+.navbar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
   background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(20px) saturate(1.6);
   -webkit-backdrop-filter: blur(20px) saturate(1.6);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-pill);
-  z-index: 900;
   box-shadow: 0 4px 20px -8px rgba(15, 23, 42, 0.08),
               inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  transition: top var(--transition),
-              background var(--transition),
-              box-shadow var(--transition),
-              border-color var(--transition);
+  pointer-events: none;
+  z-index: -1;
+  transition: background var(--transition),
+              border-color var(--transition),
+              box-shadow var(--transition);
 }
-.navbar.scrolled {
-  top: 12px;
+
+.navbar.scrolled { top: 12px; }
+.navbar.scrolled::before {
   background: rgba(255, 255, 255, 0.95);
   border-color: var(--border-dim);
   box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.12),
@@ -554,15 +578,15 @@ strong { font-weight: 600; color: var(--text-heading); }
   line-height: 1;
   padding: 2px 0;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
-
 .brand-top {
   display: inline-flex;
   align-items: flex-end;
   line-height: 1;
   gap: 0.05rem;
 }
-
 .brand-q-wrap {
   display: inline-block;
   width: 36px;
@@ -571,7 +595,6 @@ strong { font-weight: 600; color: var(--text-heading); }
   overflow: hidden;
   transform: translateY(-2px);
 }
-
 .brand-q {
   display: block;
   width: 100%;
@@ -586,7 +609,6 @@ strong { font-weight: 600; color: var(--text-heading); }
 .brand:hover .brand-q {
   transform: scale(1.7) rotate(-4deg);
 }
-
 .brand-letters {
   font-family: var(--font-display);
   font-weight: 700;
@@ -595,7 +617,6 @@ strong { font-weight: 600; color: var(--text-heading); }
   color: var(--text-heading);
   line-height: 1;
 }
-
 .brand-sub {
   font-family: var(--font-mono);
   font-size: 0.55rem;
@@ -611,6 +632,8 @@ strong { font-weight: 600; color: var(--text-heading); }
   display: flex;
   align-items: center;
   gap: 1.75rem;
+  position: relative;
+  z-index: 1;
 }
 .nav-links {
   display: flex;
@@ -684,6 +707,8 @@ strong { font-weight: 600; color: var(--text-heading); }
   text-transform: uppercase;
   color: var(--text-muted);
   box-shadow: var(--shadow-xs);
+  position: relative;
+  z-index: 1;
 }
 .nav-status .status-dot { width: 6px; height: 6px; }
 .nav-status .status-text { line-height: 1; }
@@ -706,6 +731,8 @@ strong { font-weight: 600; color: var(--text-heading); }
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 .nav-cta i { font-size: 0.75rem; }
 .nav-cta:hover {
@@ -721,7 +748,12 @@ strong { font-weight: 600; color: var(--text-heading); }
    ============================================================
    The hamburger stays visible at all times — including when
    the menu is open — and morphs into an X. Tapping it again
-   closes the menu. No hunting for a small × in the corner.
+   closes the menu.
+
+   Because the navbar no longer has backdrop-filter (it's on
+   .navbar::before instead), the .nav-menu panel anchors to
+   the VIEWPORT on mobile — so it slides fully off-screen when
+   closed, and shows all items when open.
    ============================================================ */
 
 /* ---- Base hamburger ---- */
@@ -732,8 +764,6 @@ strong { font-weight: 600; color: var(--text-heading); }
   height: 44px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--border-dim);
   z-index: 1001;
   align-items: center;
@@ -749,7 +779,7 @@ strong { font-weight: 600; color: var(--text-heading); }
 }
 .hamburger:active { transform: scale(0.94); }
 
-/* Rotating conic ring — only on real pointer devices */
+/* Rotating conic ring — only shown on real pointer devices */
 .hamburger-ring {
   position: absolute;
   inset: -2px;
@@ -783,8 +813,8 @@ strong { font-weight: 600; color: var(--text-heading); }
               background 0.2s ease;
 }
 
-/* Hover styles only on real pointers — prevents the ring from
-   getting stuck "on" after a tap on touch devices */
+/* Hover styles gated behind real pointers — prevents the ring
+   from getting stuck "on" after a tap on touch devices */
 @media (hover: hover) {
   .hamburger:hover { border-color: var(--border-hover); }
   .hamburger:hover .hamburger-ring { opacity: 1; }
@@ -807,7 +837,7 @@ strong { font-weight: 600; color: var(--text-heading); }
 
 @keyframes hamburgerSpin { 100% { transform: rotate(360deg); } }
 
-/* ---- Dark overlay behind the menu panel ---- */
+/* ---- Dark overlay behind the panel ---- */
 .nav-overlay {
   position: fixed;
   inset: 0;
@@ -821,19 +851,17 @@ strong { font-weight: 600; color: var(--text-heading); }
 }
 .nav-overlay.open { opacity: 1; visibility: visible; }
 
-/* When the menu is open, the navbar itself becomes invisible
-   (the panel takes over the right side; the hamburger floats
-   above it via its own higher z-index). */
-body.menu-open .navbar {
-  z-index: 1002;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+/* When the menu is open, the navbar's glass background hides */
+body.menu-open .navbar { z-index: 1002; }
+body.menu-open .navbar::before {
   background: transparent;
   border-color: transparent;
   box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-/* The in-menu close button is no longer used — hamburger closes */
+/* In-menu close button is no longer used — hamburger closes */
 .nav-close { display: none !important; }
 
 
@@ -852,6 +880,8 @@ body.menu-open .navbar {
   .hamburger { display: flex; }
 
   /* ---- Slide-in menu panel ---- */
+  /* Anchored to the VIEWPORT because navbar no longer creates a
+     containing block (backdrop-filter lives on ::before) */
   .nav-menu {
     position: fixed;
     top: 0;
@@ -859,7 +889,7 @@ body.menu-open .navbar {
     width: 82%;
     max-width: 360px;
     height: 100vh;
-    height: 100dvh;          /* modern browsers — accounts for mobile browser chrome */
+    height: 100dvh;
     padding: 5.5rem 2rem 3rem;
     background: #FFFFFF;
     border-left: 1px solid var(--border-subtle);
