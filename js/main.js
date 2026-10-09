@@ -1461,11 +1461,12 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
-  /* ============================================================
+    /* ============================================================
      19. EAGLE FLIGHT ANIMATION
-     Idle-triggered: perched eagle spins, burst fires, flying
-     eagle glides across navbar to Systems Online, holds, returns.
-     Once per session. Disabled on mobile and reduced-motion.
+     Idle → ring shakes + bubbles rise → combined logo fades to
+     empty ring → eagle flies right to Systems Online → pill
+     shakes + glows → eagle flies back left → lands in ring →
+     combined logo restores. Once per session. No mobile.
      ============================================================ */
   (function eagleFlight() {
     const navbar    = document.getElementById('navbar');
@@ -1478,18 +1479,18 @@
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
 
-    const SESSION_KEY    = 'qoech_eagle_flown_v1';
-    const IDLE_MS        = 20000;
-    const SPIN_MS        = 500;
-    const BURST_HOLD_MS  = 500;
-    const FLIGHT_OUT_MS  = 1800;
-    const HOLD_MS        = 3000;
-    const FLIGHT_BACK_MS = 1500;
+    const SESSION_KEY   = 'qoech_eagle_flown_v1';
+    const IDLE_MS       = 20000;
+    const T_SHAKE_MS    = 600;
+    const T_SWAP_MS     = 400;
+    const T_FLIGHT_OUT  = 3600;
+    const T_PILL_MS     = 2500;
+    const T_FLIGHT_BACK = 3200;
+    const T_RESET_MS    = 500;
 
     let idleTimer = null;
     let running   = false;
 
-    // Skip entirely if already flown this session
     try {
       if (sessionStorage.getItem(SESSION_KEY) === '1') return;
     } catch (_) {}
@@ -1518,71 +1519,81 @@
 
       const pos = computePositions();
 
-      // Position flying eagle at the ring's center
       eagle.style.left = pos.startX + 'px';
       eagle.style.top  = pos.startY + 'px';
       eagle.style.setProperty('--fly-distance', pos.outDistance + 'px');
       eagle.src = 'images/logo/eagle-right.png';
 
-      // Position the burst at the ring's center
       burst.style.left = pos.startX + 'px';
       burst.style.top  = pos.startY + 'px';
 
-      // Phase 1 — spin
-      brandQ.classList.add('nav-spinning');
+      // Phase 1 — bubbles + ring shake
+      burst.classList.add('active');
+      brandQ.classList.add('nav-ring-shake');
 
-      // Phase 2 — burst + brand hidden + flying eagle appears
+      // Phase 2 — shake ends
       setTimeout(() => {
-        burst.classList.add('active');
-        brandQ.classList.add('nav-hidden');
-        brandQ.style.opacity = '0';
-        brandQ.src = 'images/logo/q-ring.png';        // ring only while flying
-        eagle.classList.add('flying');
-      }, SPIN_MS);
+        brandQ.classList.remove('nav-ring-shake');
+      }, T_SHAKE_MS);
 
-      // Phase 3 — burst fades
+      // Phase 3 — combined logo fades out
+      setTimeout(() => {
+        brandQ.style.opacity = '0';
+      }, T_SHAKE_MS + 100);
+
+      // Phase 4 — empty ring, eagle starts flying right
+      setTimeout(() => {
+        brandQ.src = 'images/logo/q-ring.png';
+        brandQ.style.opacity = '1';
+        eagle.classList.add('flying');
+      }, T_SHAKE_MS + 100 + T_SWAP_MS);
+
+      // Phase 5 — bubbles cleanup
       setTimeout(() => {
         burst.classList.remove('active');
-      }, SPIN_MS + BURST_HOLD_MS + 200);
+      }, T_SHAKE_MS + 1500);
 
-      // Phase 4 — landed on pill
+      // Phase 6 — eagle reaches pill, pill shakes + glows
       setTimeout(() => {
         eagle.classList.remove('flying');
         eagle.style.left = pos.endX + 'px';
         eagle.style.top  = pos.endY + 'px';
         eagle.classList.add('perched');
         navStatus.classList.add('systems-checking');
-      }, SPIN_MS + BURST_HOLD_MS + FLIGHT_OUT_MS);
+      }, T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT);
 
-      // Phase 5 — return flight begins
+      // Phase 7 — eagle turns around and flies back
       setTimeout(() => {
         navStatus.classList.remove('systems-checking');
 
         eagle.classList.remove('perched');
-        eagle.src = 'images/logo/eagle-left.png';     // flip to left-facing
+        eagle.src = 'images/logo/eagle-left.png';
         eagle.style.left = pos.endX + 'px';
         eagle.style.top  = pos.endY + 'px';
         eagle.style.setProperty('--fly-distance', pos.backDistance + 'px');
         eagle.classList.add('returning');
-      }, SPIN_MS + BURST_HOLD_MS + FLIGHT_OUT_MS + HOLD_MS);
+      }, T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT + T_PILL_MS);
 
-      // Phase 6 — back home, reveal perched logo
+      // Phase 8 — eagle lands in the ring, restore combined logo
       setTimeout(() => {
         eagle.classList.remove('returning');
         eagle.classList.add('hidden');
-        brandQ.src = 'images/logo/qoech-q.png';       // full logo back
-        brandQ.style.opacity = '';
-        brandQ.classList.remove('nav-spinning', 'nav-hidden');
-      }, SPIN_MS + BURST_HOLD_MS + FLIGHT_OUT_MS + HOLD_MS + FLIGHT_BACK_MS);
 
-      // Phase 7 — reset
+        brandQ.style.opacity = '0';
+        setTimeout(() => {
+          brandQ.src = 'images/logo/qoech-logo.png';
+          brandQ.style.opacity = '1';
+        }, 250);
+      }, T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT + T_PILL_MS + T_FLIGHT_BACK);
+
+      // Phase 9 — full reset
       setTimeout(() => {
-        eagle.classList.remove('hidden', 'perched');
+        eagle.classList.remove('hidden', 'perched', 'flying', 'returning');
         eagle.style.left = '';
         eagle.style.top  = '';
         eagle.style.removeProperty('--fly-distance');
         running = false;
-      }, SPIN_MS + BURST_HOLD_MS + FLIGHT_OUT_MS + HOLD_MS + FLIGHT_BACK_MS + 400);
+      }, T_SHAKE_MS + T_SWAP_MS + T_FLIGHT_OUT + T_PILL_MS + T_FLIGHT_BACK + T_RESET_MS);
     };
 
     const armIdle = () => {
@@ -1602,7 +1613,6 @@
       document.addEventListener(evt, armIdle, { passive: true });
     });
 
-    // Start the countdown
     armIdle();
   })();
 })();
