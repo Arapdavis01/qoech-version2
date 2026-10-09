@@ -28,11 +28,12 @@
    24. Modals (Service + Project)
    25. Fade-up Scroll Animations
    26. Qoech Mark Sizing (transparent-PNG)
-   27. Responsive Breakpoints
+   27. Responsive Breakpoints  ← REWRITTEN
    28. Contact Wizard
    29. Digital Layer (grain, status, brackets, dividers, watermarks)
    30. Modal Variants (image + terminal)
    31. Digital Refinements (title divider, banner images, thumb badge)
+   32. Eagle Flight Animation
    ============================================================ */
 
 
@@ -395,7 +396,6 @@ strong { font-weight: 600; color: var(--text-heading); }
   box-shadow: 0 0 30px var(--primary-glow), inset 0 0 20px var(--primary-soft);
 }
 
-/* Inner crop wrapper — clips the PNG's padding away */
 .preloader-q-wrap {
   position: relative;
   z-index: 1;
@@ -412,7 +412,6 @@ strong { font-weight: 600; color: var(--text-heading); }
   width: 100%;
   height: 100%;
   object-fit: contain;
-  /* Push PNG's padding out of view. Tune 1.4 → 2.4 until the eagle fills the ring. */
   transform: scale(1.7);
   transform-origin: center;
   filter: drop-shadow(0 4px 12px rgba(22, 163, 74, 0.22));
@@ -464,6 +463,7 @@ strong { font-weight: 600; color: var(--text-heading); }
   0%, 100% { transform: scale(1.7); }
   50% { transform: scale(1.73); }
 }
+
 
 /* ============================================================
    06. SCROLL PROGRESS BAR
@@ -536,7 +536,6 @@ strong { font-weight: 600; color: var(--text-heading); }
               inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
-/* ---- Brand: the Q logo tucks into "OECH" as one wordmark ---- */
 .brand {
   display: inline-flex;
   flex-direction: column;
@@ -548,8 +547,6 @@ strong { font-weight: 600; color: var(--text-heading); }
   flex-shrink: 0;
 }
 
-/* Bottom-align Q and OECH so they share a baseline.
-   Gap is tight (0.05rem ≈ 0.8px) so the Q reads as part of the word. */
 .brand-top {
   display: inline-flex;
   align-items: flex-end;
@@ -557,21 +554,15 @@ strong { font-weight: 600; color: var(--text-heading); }
   gap: 0.05rem;
 }
 
-/* Crop wrapper — clips the PNG's transparent padding away.
-   This is the box that actually occupies space in the layout. */
 .brand-q-wrap {
   display: inline-block;
   width: 36px;
   height: 36px;
   flex-shrink: 0;
   overflow: hidden;
-  /* Pulls the wrapper up so the visible eagle's base sits on the
-     OECH baseline. Tune -1px → -4px in 1px steps. */
   transform: translateY(-2px);
 }
 
-/* The actual image — scaled up so its internal padding is pushed
-   outside the 36px box and clipped. Tune 1.5 → 2.3. */
 .brand-q {
   display: block;
   width: 100%;
@@ -596,7 +587,6 @@ strong { font-weight: 600; color: var(--text-heading); }
   line-height: 1;
 }
 
-/* TECHNOLOGIES aligns under OECH, not under the Q */
 .brand-sub {
   font-family: var(--font-mono);
   font-size: 0.55rem;
@@ -607,7 +597,6 @@ strong { font-weight: 600; color: var(--text-heading); }
   line-height: 1;
 }
 
-/* ---- Nav menu wrapper ---- */
 .nav-menu {
   display: flex;
   align-items: center;
@@ -619,7 +608,6 @@ strong { font-weight: 600; color: var(--text-heading); }
   gap: 1.75rem;
 }
 
-/* ---- Nav links with icon reveal ---- */
 .nav-link {
   position: relative;
   display: inline-flex;
@@ -669,7 +657,6 @@ strong { font-weight: 600; color: var(--text-heading); }
 .nav-link.active { color: var(--primary-dark); font-weight: 600; }
 .nav-link.active::after { width: 100%; }
 
-/* ---- Systems-online pill ---- */
 .nav-status {
   display: inline-flex;
   align-items: center;
@@ -689,7 +676,6 @@ strong { font-weight: 600; color: var(--text-heading); }
 .nav-status .status-dot { width: 6px; height: 6px; }
 .nav-status .status-text { line-height: 1; }
 
-/* ---- Nav CTA ---- */
 .nav-cta {
   display: inline-flex;
   align-items: center;
@@ -715,6 +701,8 @@ strong { font-weight: 600; color: var(--text-heading); }
   transform: translateY(-1px);
   box-shadow: var(--shadow-brand);
 }
+
+
 /* ============================================================
    10. HAMBURGER + MOBILE MENU
    ============================================================ */
@@ -1170,7 +1158,6 @@ body.menu-open .navbar {
 }
 @keyframes ringSpin { 100% { transform: rotate(360deg); } }
 
-/* ---- Free-floating eagle mark — no circle wrapper ---- */
 .visual-core {
   position: relative;
   width: 240px;
@@ -1191,10 +1178,8 @@ body.menu-open .navbar {
   height: 100%;
   display: block;
   object-fit: contain;
-  /* Crops the PNG's transparent padding so the eagle fills the box */
   transform: scale(1.7);
   transform-origin: center;
-  /* Strong drop-shadow gives lift since there's no circle behind it */
   filter: drop-shadow(0 16px 36px rgba(22, 163, 74, 0.30))
           drop-shadow(0 4px 12px rgba(15, 23, 42, 0.15));
 }
@@ -1204,7 +1189,6 @@ body.menu-open .navbar {
   50% { transform: scale(1.04); }
 }
 
-/* Ripple expanding from the eagle */
 .visual-pulse {
   position: absolute;
   width: 240px;
@@ -1326,6 +1310,7 @@ body.menu-open .navbar {
   color: var(--text-muted);
 }
 .ticker-item i { color: var(--primary); font-size: 0.65rem; }
+
 
 /* ============================================================
    12. ABOUT
@@ -2743,7 +2728,6 @@ body.menu-open .navbar {
   isolation: isolate;
 }
 
-/* Layer 1 — background photo/texture */
 .footer-bg {
   position: absolute;
   inset: 0;
@@ -2756,7 +2740,6 @@ body.menu-open .navbar {
   pointer-events: none;
 }
 
-/* Layer 2 — lighter white wash so the texture reads through */
 .footer-bg-overlay {
   position: absolute;
   inset: 0;
@@ -2770,7 +2753,6 @@ body.menu-open .navbar {
   pointer-events: none;
 }
 
-/* Animated top scanline */
 .footer-scanline {
   position: absolute;
   top: 0;
@@ -2974,6 +2956,8 @@ body.menu-open .navbar {
   color: var(--primary-dark);
 }
 .mono-val-ok .status-dot { width: 5px; height: 5px; }
+
+
 /* ============================================================
    23. BACK TO TOP
    ============================================================ */
@@ -3167,7 +3151,6 @@ body.menu-open .navbar {
   backface-visibility: hidden;
 }
 
-/* Preloader — sized via Section 05, kept here for scale consistency */
 .preloader-q {
   width: 100%;
   height: 100%;
@@ -3176,8 +3159,6 @@ body.menu-open .navbar {
   animation: preloaderPulse 2s ease-in-out infinite;
 }
 
-/* Hero visual-core — free-floating mark, no circle, no clipping.
-   Layout comes from Section 11; this is just the sizing override. */
 .visual-core {
   overflow: visible;
   border-radius: 0;
@@ -3190,7 +3171,6 @@ body.menu-open .navbar {
           drop-shadow(0 4px 12px rgba(15, 23, 42, 0.15));
 }
 
-/* About card preview tile */
 .about-card-mark {
   overflow: hidden;
 }
@@ -3201,7 +3181,6 @@ body.menu-open .navbar {
   filter: drop-shadow(0 2px 10px rgba(22, 163, 74, 0.20));
 }
 
-/* Footer mark */
 .footer-q {
   height: 34px;
   width: 34px;
@@ -3209,9 +3188,180 @@ body.menu-open .navbar {
   margin-right: 0.1rem;
   filter: drop-shadow(0 2px 6px rgba(22, 163, 74, 0.20));
 }
+
+
 /* ============================================================
-   27. RESPONSIVE BREAKPOINTS
+   27. RESPONSIVE BREAKPOINTS  —  REWRITTEN
+   ============================================================
+   Mobile strategy (≤ 768px):
+     • Wide-card sections — Services, Featured Projects, Process,
+       Why Qoech — become horizontal swipe carousels with snap
+       points. Next card peeks in from the right to signal more.
+     • Compact-item sections — Solutions, Technologies, Values,
+       Capabilities — become 2-column dense grids.
+     • Vertical list (Other Systems) stays vertical.
+     • iOS input zoom is prevented (16px minimum on inputs).
+     • Hover lift effects are disabled on touch to avoid sticky
+       states after taps.
    ============================================================ */
+
+/* ------------------------------------------------------------
+   Shared mobile carousel base — applied to 4 sections
+   ------------------------------------------------------------ */
+@media (max-width: 768px) {
+  /* --- Carousels: services, projects, process, why --- */
+  .services-grid,
+  .featured-projects-grid,
+  .process-timeline,
+  .why-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 0.9rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-left: 1.25rem;
+    padding: 0.5rem 1.25rem 1.35rem;
+    margin: 0 -1.25rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overscroll-behavior-x: contain;
+  }
+  .services-grid::-webkit-scrollbar,
+  .featured-projects-grid::-webkit-scrollbar,
+  .process-timeline::-webkit-scrollbar,
+  .why-grid::-webkit-scrollbar { display: none; }
+
+  /* Default card width (peek of next card ≈ 18%) */
+  .services-grid > *,
+  .process-timeline > *,
+  .why-grid > * {
+    flex: 0 0 82%;
+    max-width: 82%;
+    scroll-snap-align: start;
+  }
+
+  /* Projects carry a 16:10 image — give them a touch more width */
+  .featured-projects-grid > * {
+    flex: 0 0 88%;
+    max-width: 88%;
+    scroll-snap-align: start;
+  }
+
+  /* Process timeline had a decorative connector line — not needed in a carousel */
+  .process-timeline::before { display: none; }
+  .process-step { justify-content: flex-start; }
+
+  /* Why cards already center text; give them a little breathing room */
+  .why-card { padding: 1.75rem 1.25rem; }
+
+  /* Kill hover lift effects on touch devices — they stick on tap */
+  .service-card:hover,
+  .solution-card:hover,
+  .featured-project-card:hover,
+  .tech-category:hover,
+  .why-card:hover,
+  .process-step:hover .process-number,
+  .value-item:hover,
+  .stat-card:hover,
+  .capability-item:hover,
+  .other-system-item:hover,
+  .contact-card:hover {
+    transform: none;
+  }
+  .service-card:hover .service-icon,
+  .solution-card:hover .solution-icon,
+  .why-card:hover .why-icon { transform: none; }
+  .featured-project-card:hover .featured-project-thumb img { transform: none; }
+  .featured-project-card:hover .thumb-scan { left: -100%; }
+
+  /* Prevent text selection jitter while swiping */
+  .services-grid,
+  .featured-projects-grid,
+  .process-timeline,
+  .why-grid {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Restore text selection inside the cards themselves */
+  .services-grid .service-card,
+  .featured-projects-grid .featured-project-card,
+  .process-timeline .process-card,
+  .why-grid .why-card {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  /* --- Compact 2-column grids: solutions, tech, values, capabilities --- */
+  .solutions-grid,
+  .tech-grid,
+  .values-grid,
+  .capabilities-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+
+  .solution-card { padding: 1.25rem 1rem; }
+  .solution-icon { width: 40px; height: 40px; font-size: 0.95rem; margin-bottom: 0.9rem; border-radius: 10px; }
+  .solution-card h3 { font-size: 0.9rem; margin-bottom: 0.4rem; }
+  .solution-card > p { font-size: 0.775rem; line-height: 1.55; margin-bottom: 0.85rem; }
+  .solution-list li { font-size: 0.72rem; }
+
+  .tech-category { padding: 1.15rem 1rem; }
+  .tech-category-head { padding-bottom: 0.7rem; margin-bottom: 0.85rem; gap: 0.55rem; }
+  .tech-category-head i { width: 26px; height: 26px; font-size: 0.7rem; }
+  .tech-category-head h3 { font-size: 0.65rem; letter-spacing: 0.08em; }
+  .tech-chip { padding: 0.32rem 0.6rem; font-size: 0.65rem; gap: 0.3rem; }
+  .tech-chip i { font-size: 0.7rem; }
+
+  .value-item { padding: 0.9rem 0.8rem; gap: 0.6rem; }
+  .value-item i { font-size: 0.95rem; }
+  .value-item h4 { font-size: 0.8rem; }
+  .value-item p { font-size: 0.7rem; line-height: 1.45; }
+
+  .capability-item { padding: 0.7rem 0.85rem; font-size: 0.775rem; gap: 0.55rem; }
+  .capability-item i { font-size: 0.8rem; width: 16px; }
+
+  /* Featured projects grid was 1 column — carousel above overrides */
+  .featured-projects-grid .featured-project-card:last-child {
+    grid-column: auto;
+    max-width: none;
+    margin: 0;
+  }
+
+  /* --- Other systems: vertical list, tighten --- */
+  .other-system-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 1rem 1.1rem;
+  }
+  .other-system-meta { justify-content: flex-start; }
+  .other-system-info { gap: 0.85rem; }
+  .other-system-info h4 { font-size: 0.875rem; }
+  .other-system-info p { font-size: 0.75rem; }
+
+  /* --- Capabilities panel --- */
+  .capabilities { padding: 2rem 1.35rem; }
+
+  /* --- Stats grid stays 3-across but compresses --- */
+  .stats-grid { gap: 0.5rem; }
+  .stat-card { padding: 0.85rem 0.75rem; gap: 0.55rem; flex-direction: column; align-items: flex-start; }
+  .stat-icon { width: 34px; height: 34px; font-size: 0.8rem; }
+  .stat-number { font-size: 1.15rem; }
+  .stat-label { font-size: 0.55rem; }
+
+  /* --- About cards stack tighter --- */
+  .about-card { padding: 1.65rem 1.4rem; }
+  .about-card-mark { width: 56px; height: 56px; }
+}
+
+/* ------------------------------------------------------------
+   1100px — tablet landscape
+   ------------------------------------------------------------ */
 @media (max-width: 1100px) {
   .hero-container { grid-template-columns: 1fr; gap: 3.5rem; text-align: center; }
   .hero-content { max-width: 100%; margin: 0 auto; }
@@ -3244,11 +3394,14 @@ body.menu-open .navbar {
   }
 }
 
+/* ------------------------------------------------------------
+   850px — tablet portrait
+   ------------------------------------------------------------ */
 @media (max-width: 850px) {
   .section { padding: 5.5rem 0; }
   .section-title { font-size: clamp(1.625rem, 5vw, 2.125rem); }
   .services-grid { grid-template-columns: repeat(2, 1fr); }
-  .values-grid { grid-template-columns: 1fr; }
+  .values-grid { grid-template-columns: 1fr 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
   .footer-bottom { flex-direction: column; text-align: center; }
 
@@ -3259,15 +3412,9 @@ body.menu-open .navbar {
   .eagle-readout { padding: 0.85rem 1.25rem; gap: 1rem; }
 }
 
-@media (max-width: 768px) {
-  .featured-projects-grid { grid-template-columns: 1fr; }
-  .featured-projects-grid .featured-project-card:last-child { max-width: 100%; }
-  .other-system-item { flex-direction: column; align-items: flex-start; gap: 0.9rem; }
-  .other-system-meta { justify-content: flex-start; }
-  .capabilities { padding: 2rem 1.5rem; }
-  .capabilities-grid { grid-template-columns: 1fr 1fr; }
-}
-
+/* ------------------------------------------------------------
+   640px — mobile portrait
+   ------------------------------------------------------------ */
 @media (max-width: 640px) {
   :root { --nav-height: 64px; }
   .container { padding: 0 1.25rem; }
@@ -3280,14 +3427,12 @@ body.menu-open .navbar {
   }
   .navbar.scrolled { top: 8px; }
 
-  /* ---- Brand: mobile scaling for the crop-wrapper approach ---- */
   .brand-q-wrap { width: 30px; height: 30px; transform: translateY(-2px); }
   .brand-q { transform: scale(1.7); }
   .brand:hover .brand-q { transform: scale(1.7) rotate(-4deg); }
   .brand-letters { font-size: 1.15rem; letter-spacing: 0.12em; }
   .brand-sub { font-size: 0.5rem; letter-spacing: 0.28em; margin-left: calc(30px + 0.05rem); }
 
-  /* ---- Preloader: scale kept, size handled by crop wrapper ---- */
   .preloader-text { font-size: 1.3rem; }
   .preloader-q { transform: scale(1.7); }
   .preloader-readout { font-size: 0.6rem; }
@@ -3299,7 +3444,6 @@ body.menu-open .navbar {
   .hero-typing { font-size: 0.85rem; }
   .hero-actions .btn { flex: 1; justify-content: center; }
   .visual-stage { width: 260px; height: 260px; }
-  /* Free-floating eagle scaled up to match the no-circle layout */
   .visual-core { width: 170px; height: 170px; }
   .visual-core-mark { width: 100%; height: 100%; transform: scale(1.7); }
   .visual-pulse { width: 170px; height: 170px; }
@@ -3315,22 +3459,95 @@ body.menu-open .navbar {
   .hero-ticker { display: none; }
   .scroll-down { bottom: 2rem; }
 
-  .about-card { padding: 1.75rem 1.5rem; }
-  .about-card-mark { width: 52px; height: 52px; }
+  .about-card { padding: 1.5rem 1.25rem; }
+  .about-card-mark { width: 48px; height: 48px; }
   .footer-q { height: 28px; width: 28px; transform: scale(1.5); }
 
   .section-head { margin-bottom: 2.75rem; }
   .section-label { font-size: 0.6rem; padding: 0.35rem 0.85rem; }
 
-  .services-grid { grid-template-columns: 1fr; }
-  .solutions-grid { grid-template-columns: 1fr; }
-  .tech-grid { grid-template-columns: 1fr; }
-  .why-grid { grid-template-columns: repeat(2, 1fr); }
-  .stats-grid { grid-template-columns: 1fr; }
+  /* At ≤640px the carousel breakpoint already applied at 768.
+     These tweaks just narrow the cards slightly for a tighter feel. */
+  .services-grid > *,
+  .process-timeline > *,
+  .why-grid > * { flex-basis: 85%; max-width: 85%; }
+  .featured-projects-grid > * { flex-basis: 90%; max-width: 90%; }
 
-  .process-timeline { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  /* Compact grids — slightly tighter */
+  .solutions-grid,
+  .tech-grid,
+  .values-grid,
+  .capabilities-grid { gap: 0.55rem; }
+
+  .solution-card { padding: 1.1rem 0.9rem; }
+  .solution-icon { width: 36px; height: 36px; font-size: 0.85rem; }
+  .solution-card h3 { font-size: 0.85rem; }
+  .solution-card > p { font-size: 0.72rem; }
+  .solution-list li { font-size: 0.68rem; }
+
+  .tech-category { padding: 1rem 0.85rem; }
+  .tech-chip { padding: 0.28rem 0.55rem; font-size: 0.62rem; }
+  .tech-chip i { font-size: 0.65rem; }
+
+  .value-item { padding: 0.8rem 0.7rem; }
+  .value-item i { font-size: 0.85rem; margin-top: 1px; }
+  .value-item h4 { font-size: 0.75rem; }
+  .value-item p { font-size: 0.65rem; }
+
+  .capability-item { padding: 0.6rem 0.7rem; font-size: 0.72rem; }
+
+  /* Stats: keep 3-across but smaller */
+  .stats-grid { gap: 0.4rem; }
+  .stat-card { padding: 0.7rem 0.6rem; }
+  .stat-icon { width: 30px; height: 30px; font-size: 0.75rem; border-radius: 8px; }
+  .stat-number { font-size: 1rem; }
+  .stat-label { font-size: 0.5rem; letter-spacing: 0.04em; }
+
+  /* Process / Why cards a touch tighter */
   .process-number { width: 60px; height: 60px; font-size: 0.9rem; }
+  .process-card p { font-size: 0.7rem; }
+  .why-card { padding: 1.4rem 1rem; }
+  .why-icon { width: 44px; height: 44px; font-size: 0.95rem; }
+  .why-card h3 { font-size: 0.875rem; }
+  .why-card p { font-size: 0.72rem; }
 
+  /* Service card inner sizing */
+  .service-card { padding: 1.4rem 1.2rem 1.2rem; }
+  .service-icon { width: 42px; height: 42px; font-size: 1rem; margin-bottom: 0.9rem; border-radius: 10px; }
+  .service-card h3 { font-size: 0.9375rem; }
+  .service-card > p { font-size: 0.7875rem; }
+  .service-points li { font-size: 0.72rem; }
+
+  /* Featured project card body */
+  .featured-project-body { padding: 1.25rem 1.25rem 1.35rem; }
+  .featured-project-body h3 { font-size: 0.9375rem; }
+  .featured-project-body > p { font-size: 0.7875rem; }
+
+  /* --- Fix iOS input zoom: min 16px on all form controls --- */
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .wizard-form input,
+  .wizard-form select,
+  .wizard-form textarea {
+    font-size: 16px;
+  }
+
+  /* Testimonial dots — bigger tap target */
+  .dot {
+    width: 10px;
+    height: 10px;
+    padding: 8px;
+    box-sizing: content-box;
+    background-clip: content-box;
+    border-radius: 50%;
+  }
+  .dot.active {
+    width: 22px;
+    padding: 8px 6px;
+  }
+
+  /* Eagle section */
   .eagle-section { padding: 5.5rem 0; }
   .eagle-figure { width: 340px; height: 340px; }
   .eagle-readout { gap: 0.75rem; padding: 0.75rem 1rem; flex-direction: column; }
@@ -3349,19 +3566,49 @@ body.menu-open .navbar {
   .back-to-top { bottom: 1.25rem; right: 1.25rem; width: 42px; height: 42px; font-size: 0.85rem; }
 }
 
+/* ------------------------------------------------------------
+   520px — small phones
+   ------------------------------------------------------------ */
 @media (max-width: 520px) {
+  /* Capabilities drop to single column at very small width */
   .capabilities-grid { grid-template-columns: 1fr; }
 }
 
+/* ------------------------------------------------------------
+   480px — extra small phones
+   ------------------------------------------------------------ */
+@media (max-width: 480px) {
+  /* Values cards get tight — let them go 1-col */
+  .values-grid { grid-template-columns: 1fr; }
+
+  /* Slightly wider carousel cards on tiny screens */
+  .services-grid > *,
+  .process-timeline > *,
+  .why-grid > * { flex-basis: 88%; max-width: 88%; }
+  .featured-projects-grid > * { flex-basis: 92%; max-width: 92%; }
+
+  /* Tighter compact grids */
+  .solutions-grid,
+  .tech-grid { gap: 0.5rem; }
+
+  .stats-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+  .stat-card { flex-direction: row; align-items: center; }
+}
+
+/* ------------------------------------------------------------
+   420px — very small phones
+   ------------------------------------------------------------ */
 @media (max-width: 420px) {
-  .why-grid { grid-template-columns: 1fr; }
-  .process-timeline { grid-template-columns: 1fr; }
+  .process-timeline > * { flex-basis: 90%; max-width: 90%; }
   .hero-actions { flex-direction: column; }
   .hero-actions .btn { width: 100%; }
   .about-actions { flex-direction: column; }
   .about-actions .btn { width: 100%; }
 }
 
+/* ------------------------------------------------------------
+   prefers-reduced-motion — kill all animations
+   ------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -3373,6 +3620,8 @@ body.menu-open .navbar {
   .thumb-scan { display: none; }
   .footer-scanline { display: none; }
 }
+
+
 /* ============================================================
    28. CONTACT WIZARD
    ============================================================ */
@@ -4170,6 +4419,8 @@ body.menu-open .navbar {
   .btn-shine::before { display: none; }
   .btn-shine:hover .fa-rocket { animation: none; }
 }
+
+
 /* ============================================================
    32. EAGLE FLIGHT ANIMATION — full choreography
    ============================================================ */
@@ -4177,7 +4428,6 @@ body.menu-open .navbar {
 .brand { position: relative; z-index: 6; }
 .nav-menu { position: relative; z-index: 6; }
 
-/* ---------- Ring shake (trigger) ---------- */
 .brand-q.nav-ring-shake {
   animation: ringShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
@@ -4192,7 +4442,6 @@ body.menu-open .navbar {
   90%      { transform: scale(1.70) translateX(-1px) rotate(-1deg); }
 }
 
-/* ---------- Flying eagle ---------- */
 .nav-flying-eagle {
   position: absolute;
   left: 0;
@@ -4221,7 +4470,6 @@ body.menu-open .navbar {
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Slow, gliding arc — natural eagle flight */
 @keyframes flyRight {
   0%   { opacity: 0; transform: translate(-50%, -50%) translateX(0) translateY(0) rotate(0) scale(0.65); }
   10%  { opacity: 1; }
@@ -4245,29 +4493,23 @@ body.menu-open .navbar {
   100% { transform: translate(-50%, -50%) translateX(var(--fly-distance)) translateY(0) rotate(0) scale(0.6); opacity: 0; }
 }
 
-/* Landing choreography: hover → drop → squash → settle → gentle bob */
 @keyframes perchedLand {
-  0%   { transform: translate(-50%, calc(-50% - 26px)) scale(0.90); }   /* hover */
-  13%  { transform: translate(-50%, calc(-50% - 24px)) scale(0.94); }   /* hover beat */
-  20%  { transform: translate(-50%, calc(-50% - 6px))  scale(1.10); }   /* fast drop */
-  26%  { transform: translate(-50%, calc(-50% - 4px))  scale(1.05, 0.88); } /* squash on impact */
-  36%  { transform: translate(-50%, calc(-50% - 2px))  scale(1.02, 0.96); } /* recover */
-  48%  { transform: translate(-50%, calc(-50% - 0px))  scale(1); }      /* settle */
-  64%  { transform: translate(-50%, calc(-50% - 3px))  scale(1); }      /* bob up */
-  78%  { transform: translate(-50%, calc(-50% - 0px))  scale(1); }      /* bob down */
-  90%  { transform: translate(-50%, calc(-50% - 2px))  scale(1); }      /* settle */
-  100% { transform: translate(-50%, calc(-50% - 0px))  scale(1); }      /* stable */
+  0%   { transform: translate(-50%, calc(-50% - 26px)) scale(0.90); }
+  13%  { transform: translate(-50%, calc(-50% - 24px)) scale(0.94); }
+  20%  { transform: translate(-50%, calc(-50% - 6px))  scale(1.10); }
+  26%  { transform: translate(-50%, calc(-50% - 4px))  scale(1.05, 0.88); }
+  36%  { transform: translate(-50%, calc(-50% - 2px))  scale(1.02, 0.96); }
+  48%  { transform: translate(-50%, calc(-50% - 0px))  scale(1); }
+  64%  { transform: translate(-50%, calc(-50% - 3px))  scale(1); }
+  78%  { transform: translate(-50%, calc(-50% - 0px))  scale(1); }
+  90%  { transform: translate(-50%, calc(-50% - 2px))  scale(1); }
+  100% { transform: translate(-50%, calc(-50% - 0px))  scale(1); }
 }
 
-/* ---------- Brand Q opacity transition for swaps ---------- */
 #brandQ { transition: opacity 0.4s ease; }
 
-/* ============================================================
-   PILL IMPACT EFFECTS
-   ============================================================ */
 .nav-status { position: relative; }
 
-/* Shockwave ring expanding outward */
 .nav-status::before {
   content: '';
   position: absolute;
@@ -4286,7 +4528,6 @@ body.menu-open .navbar {
   100% { opacity: 0;   transform: scale(1.9); border-width: 1px; }
 }
 
-/* Soft green flash behind pill */
 .nav-status::after {
   content: '';
   position: absolute;
@@ -4309,7 +4550,6 @@ body.menu-open .navbar {
   100% { opacity: 0; transform: scale(1.35); }
 }
 
-/* Status dot ignition burst */
 .nav-status.systems-checking .status-dot {
   animation: dotIgnite 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -4320,7 +4560,6 @@ body.menu-open .navbar {
   100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
 }
 
-/* Text flash on "Systems Online" */
 .nav-status.systems-checking .status-text {
   animation: textFlash 1.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -4330,7 +4569,6 @@ body.menu-open .navbar {
   100% { color: var(--text-muted); }
 }
 
-/* Pill shake + glow (kept from before) */
 .nav-status.systems-checking {
   animation: pillShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97),
              pillPulse 2.5s ease-in-out;
@@ -4351,9 +4589,6 @@ body.menu-open .navbar {
                          0 0 22px rgba(34, 197, 94, 0.40); }
 }
 
-/* ============================================================
-   SPARKS — tiny particles flung outward on impact
-   ============================================================ */
 .nav-sparks {
   position: absolute;
   width: 0;
@@ -4378,9 +4613,6 @@ body.menu-open .navbar {
   100% { opacity: 0; transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(0.3); }
 }
 
-/* ============================================================
-   NAVBAR IMPACT FLASH
-   ============================================================ */
 .navbar.impact {
   animation: navbarImpact 0.5s ease-out;
 }
@@ -4391,9 +4623,6 @@ body.menu-open .navbar {
   100% { box-shadow: 0 4px 20px -8px rgba(15, 23, 42, 0.08); }
 }
 
-/* ============================================================
-   BUBBLES (unchanged)
-   ============================================================ */
 .nav-burst {
   position: absolute;
   width: 0;
@@ -4436,7 +4665,6 @@ body.menu-open .navbar {
 .nav-bubble:nth-child(7) { width: 13px; height: 13px; --bx:   6px; animation-delay: 0.11s; }
 .nav-bubble:nth-child(8) { width:  9px; height:  9px; --bx:  20px; animation-delay: 0.19s; }
 
-/* ---------- Guards ---------- */
 @media (prefers-reduced-motion: reduce) {
   .nav-flying-eagle,
   .nav-burst,
