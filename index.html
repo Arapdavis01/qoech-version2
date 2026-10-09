@@ -7,11 +7,23 @@
 
   <script>
     (function () {
+      // Prevent browser from restoring scroll on reload
       if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+      // Strip any hash so the browser can't auto-scroll to a section
       if (window.location.hash) {
         history.replaceState(null, '', window.location.pathname + window.location.search);
       }
+
+      // Reset scroll immediately and again once the document is ready.
+      // The delayed calls catch browsers that re-scroll after parsing.
       window.scrollTo(0, 0);
+      document.addEventListener('DOMContentLoaded', function () {
+        window.scrollTo(0, 0);
+      });
+      window.addEventListener('load', function () {
+        window.scrollTo(0, 0);
+      });
     })();
   </script>
 
@@ -47,7 +59,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js" defer></script>
 
-  <link rel="stylesheet" href="css/style.css?v=21" />
+  <link rel="stylesheet" href="css/style.css?v=22" />
 </head>
 
 <body>
@@ -78,10 +90,8 @@
 
   <!-- ===================== NAVBAR (floating pill) ===================== -->
   <header class="navbar" id="navbar">
-    <!-- Flying eagle — starts hidden, animated by JS -->
     <img class="nav-flying-eagle" id="navFlyingEagle" src="images/logo/eagle-right.png" alt="" aria-hidden="true" />
 
-    <!-- Bubble burst that fires at the ring -->
     <span class="nav-burst" id="navBurst" aria-hidden="true">
       <span class="nav-bubble"></span>
       <span class="nav-bubble"></span>
@@ -103,7 +113,6 @@
       <span class="brand-sub">TECHNOLOGIES</span>
     </a>
 
-    <!-- Desktop-only links (hidden ≤ 1024px) -->
     <ul class="nav-links nav-links-desktop">
       <li><a href="#home" class="nav-link active"><i class="fas fa-circle"></i><span>Home</span></a></li>
       <li><a href="#about" class="nav-link"><i class="fas fa-circle"></i><span>About</span></a></li>
@@ -114,13 +123,11 @@
       <li><a href="#contact" class="nav-link"><i class="fas fa-circle"></i><span>Contact</span></a></li>
     </ul>
 
-    <!-- Desktop-only status pill (target of the eagle flight animation) -->
     <div class="nav-status" id="navStatus" aria-hidden="true">
       <span class="status-dot"></span>
       <span class="status-text">Systems Online</span>
     </div>
 
-    <!-- Desktop-only CTA -->
     <a href="#contact" class="nav-cta nav-cta-desktop">
       <i class="fas fa-rocket"></i>
       <span>Start a Project</span>
@@ -135,11 +142,6 @@
   </header>
 
   <!-- ===================== MOBILE MENU PANEL ===================== -->
-  <!--
-    Sibling of the navbar — NOT a child.
-    This is what lets it anchor to the viewport on mobile, so it
-    slides fully off-screen when closed and shows all items when open.
-  -->
   <nav class="nav-menu" id="navMenu" aria-label="Primary navigation">
     <ul class="nav-links">
       <li><a href="#home" class="nav-link active"><i class="fas fa-circle"></i><span>Home</span></a></li>
@@ -151,7 +153,6 @@
       <li><a href="#contact" class="nav-link"><i class="fas fa-circle"></i><span>Contact</span></a></li>
     </ul>
 
-    <!-- Mobile-only status pill (desktop nav status lives inside the navbar) -->
     <div class="nav-status-mobile" aria-hidden="true">
       <span class="status-dot"></span>
       <span class="status-text">Systems Online</span>
@@ -1538,7 +1539,7 @@
     </div>
   </div>
 
-  <script src="js/main.js?v=17" defer></script>
+  <script src="js/main.js?v=18" defer></script>
 
 </body>
 </html>
